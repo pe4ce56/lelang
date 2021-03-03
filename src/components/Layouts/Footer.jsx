@@ -3,7 +3,7 @@ import { Fragment } from "react";
 function Footer() {
   return (
     <Fragment>
-      <div className="grid grid-cols-12 w-full px-10 py-6 bg-primary">
+      <div className="grid grid-cols-12 w-full px-6 md:px-10 py-6 bg-primary">
         <div className="col-span-12 md:col-span-6">
           <p className=" text-mont font-bold text-white text-xl">
             Browse through our products library!
@@ -41,7 +41,7 @@ function Footer() {
           </form>
         </div>
       </div>
-      <footer className="grid grid-cols-12 gap-4 px-10 py-10 pt-10">
+      <footer className="grid grid-cols-12 gap-4 px-6 md:px-10 py-10 pt-10">
         <div className="col-span-12 md:col-span-4">
           <div className=" flex">
             <h3 className="text-primary text-5xl font-sans font-bold">Le</h3>
@@ -57,7 +57,7 @@ function Footer() {
 
         <div className="col-span-12 md:col-span-4 mt-2">
           <h2 className="font-mont text-secondary font-bold text-3xl">Link</h2>
-          <ul className="font-mont text-color2 text-base list-disc">
+          <ul className="font-mont text-color2 text-base list-disc ml-6">
             <li>Handphone</li>
             <li>Laptop</li>
             <li>Headphone</li>

@@ -4,6 +4,7 @@ import Home from "./components/Home/Home";
 import Footer from "./components/Layouts/Footer";
 import ViewProductByCategory from "./components/Product/ViewProductByCategory";
 import ScrollToTop from "./ScrollToTop";
+import DetailProduct from "./components/Product/DetailProduct";
 
 function App() {
   return (
@@ -16,6 +17,9 @@ function App() {
         </Route>
         <Route exact path="/product-category/:category">
           <ViewProductByCategory />
+        </Route>
+        <Route exact path="/products/:product">
+          <DetailProduct />
         </Route>
       </Switch>
       <Footer />

@@ -7,8 +7,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useParams } from "react-router-dom";
 
-import ListView from "./ListView";
-import GridView from "./GridView";
+import ListView from "../Layouts/ListView";
+import GridView from "../Layouts/GridView";
 
 function ListProductCategory() {
   const { category } = useParams();

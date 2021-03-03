@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGavel, faSearch } from "@fortawesome/free-solid-svg-icons";
-import GridView from "../Product/GridView";
+import GridView from "../Layouts/GridView";
 
 function LatestAuction() {
   return (
