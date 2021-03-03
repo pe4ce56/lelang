@@ -15,7 +15,7 @@ function ListProductCategory() {
   const [view, setView] = useState("grid");
 
   return (
-    <section className="px-10">
+    <section className="px-2 md:px-10">
       <div className="py-6">
         <p className="text-mont text-base text-color2">Lelang / </p>
         <p className="text-mont font-bold text-3xl text-secondary capitalize">
@@ -81,7 +81,7 @@ function ListProductCategory() {
               >
                 <FontAwesomeIcon icon={faThList} size="md" />
               </button>
-              <p className="text-color3 text-mont text-lg ml-4">
+              <p className="hidden sm:block text-color3 text-mont text-lg ml-4">
                 Showing 1-3 of 10 results
               </p>
             </div>
@@ -96,9 +96,9 @@ function ListProductCategory() {
           </div>
 
           {view === "grid" ? (
-            <div className="grid grid-cols-12 mt-2 w-full  gap-4 mt-4">
+            <div className="grid grid-cols-12 mt-2 w-full gap-4 mt-4">
               {[1, 2, 3, 4].map((e) => (
-                <div className="col-span-1 sm:col-span-6 md:col-span-4">
+                <div className="col-span-6 lg:col-span-4">
                   <GridView />
                 </div>
               ))}

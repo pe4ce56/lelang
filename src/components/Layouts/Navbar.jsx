@@ -66,7 +66,7 @@ function navbar() {
             </div>
           </Link>
         </div>
-        <nav className="px-8 grid grid-flow-col grid-cols-8 bg-primary h-14 font-mont font-bold text-xs">
+        <nav className="px-10 grid grid-flow-col grid-cols-8 bg-primary h-14 font-mont font-bold text-xs">
           <button className="flex bg-white col-span-1 justify-center items-center focus:outline-none">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -82,7 +82,7 @@ function navbar() {
                 d="M4 6h16M4 12h16M4 18h16"
               />
             </svg>
-            <h6 className="text-color4">Kategori</h6>
+            <h6 className="text-color3 font-bold text-base">Kategori</h6>
           </button>
           <ul className="px-10 col-span-12 md:col-span-3  md:flex flex-grow  justify-between items-center text-white">
             <li className="nav-item flex flex-col justify-center group">

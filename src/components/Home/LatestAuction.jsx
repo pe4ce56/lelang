@@ -13,9 +13,9 @@ function LatestAuction() {
         <FontAwesomeIcon icon={faGavel} className="mx-2 text-lg text-primary" />
         <div className="border-t-2 border-color2 w-32"></div>
       </div>
-      <div className="grid grid-cols-12 px-10 mt-2 w-full  gap-4 mt-4">
+      <div className="grid grid-cols-12 px-4 md:px-10 mt-2 w-full  gap-4 mt-4">
         {[1, 2, 3, 4].map((e) => (
-          <div className="col-span-1 sm:col-span-6 md:col-span-3">
+          <div className="col-span-6  lg:col-span-3">
             <GridView />
           </div>
         ))}

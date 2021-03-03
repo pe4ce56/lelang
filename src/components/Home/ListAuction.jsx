@@ -6,7 +6,7 @@ function ListAuction() {
   return (
     <section className="grid grid-cols-12 px-10 py-10 gap-8">
       {/*blue*/}
-      <div className="col-span-3">
+      <div className="col-span-12 md:col-span-3">
         <div className="w-full h-96 bg-blue-600 flex flex-col justify-center items-center text-mont text-white">
           <p className=" font-bold text-3xl">Handphone</p>
           <p className=" text-xl">9 Produk</p>
@@ -18,10 +18,10 @@ function ListAuction() {
           </Link>
         </div>
       </div>
-      <div className="col-span-9">
+      <div className="col-span-12 md:col-span-9">
         <div className="grid grid-cols-12 gap-8">
           {[1, 2, 3, 4].map(() => (
-            <div className="col-span-6">
+            <div className="col-span-12 md:col-span-6">
               <div className="w-full h-44 shadow-lg grid grid-cols-12">
                 <div className="col-span-4 flex justify-center">
                   <img
@@ -59,7 +59,7 @@ function ListAuction() {
       </div>
       {/*end blue*/}
       {/*red*/}
-      <div className="col-span-3">
+      <div className="col-span-12 md:col-span-3">
         <div className="w-full h-96 bg-red-600 flex flex-col justify-center items-center text-mont text-white">
           <p className=" font-bold text-3xl">Handphone</p>
           <p className=" text-xl">9 Produk</p>
@@ -68,10 +68,10 @@ function ListAuction() {
           </button>
         </div>
       </div>
-      <div className="col-span-9">
+      <div className="col-span-12 md:col-span-9">
         <div className="grid grid-cols-12 gap-8">
           {[1, 2, 3, 4].map(() => (
-            <div className="col-span-6">
+            <div className="col-span-12 md:col-span-6">
               <div className="w-full h-44 shadow-lg grid grid-cols-12">
                 <div className="col-span-4 flex justify-center">
                   <img
@@ -109,7 +109,7 @@ function ListAuction() {
       </div>
       {/*end red*/}
       {/*yellow*/}
-      <div className="col-span-3">
+      <div className="col-span-12 md:col-span-3">
         <div className="w-full h-96 bg-yellow-500 flex flex-col justify-center items-center text-mont text-white">
           <p className=" font-bold text-3xl">Elektonik</p>
           <p className=" text-xl">9 Produk</p>
@@ -118,10 +118,10 @@ function ListAuction() {
           </button>
         </div>
       </div>
-      <div className="col-span-9">
+      <div className="col-span-12 md:col-span-9">
         <div className="grid grid-cols-12 gap-8">
           {[1, 2, 3, 4].map(() => (
-            <div className="col-span-6">
+            <div className="col-span-12 md:col-span-6">
               <div className="w-full h-44 shadow-lg grid grid-cols-12">
                 <div className="col-span-4 flex justify-center">
                   <img

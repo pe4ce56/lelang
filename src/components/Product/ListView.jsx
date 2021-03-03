@@ -4,15 +4,15 @@ import { faHeart } from "@fortawesome/free-regular-svg-icons";
 
 function ListView() {
   return (
-    <div className="relative rounded-sm shadow-lg w-full py-4 px-6 flex justify-between mt-2 grid grid-cols-12 h-80">
-      <div className="col-span-4 flex justify-center">
+    <div className="relative rounded-sm shadow-lg w-full py-4 px-6 flex justify-between mt-2 grid grid-cols-12 h-auto">
+      <div className="col-span-12 md:col-span-4 flex justify-center">
         <img
-          class="object-contain w-full h-auto"
+          class="object-contain w-1/2 md:w-full h-auto "
           src="/image/headphone1.jpg"
           alt="Sunset in the mountains"
         />
       </div>
-      <div className="col-span-6 pt-10">
+      <div className="col-span-12 md:col-span-6 pt-10  text-center md:text-left">
         <p className="text-2xl font-mont text-secondary font-bold  cursor-pointer hover:text-primary">
           Smartphone Buds
         </p>
@@ -22,7 +22,7 @@ function ListView() {
           silky coat. Like all long haired cats, Ragdolls need grooming to
           ensure their fur does not mat
         </p>
-        <div className="mb-2 flex mt-3">
+        <div className="mb-2 flex mt-3 justify-center md:justify-start">
           <p className="text-color2 text-sm font-mont font-normal">Tawaran:</p>
           <p className="text-secondary font-bold text-sm font-mont">
             Rp. 400.000,00
