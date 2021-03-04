@@ -8,7 +8,6 @@
   display: block;
 }
 
-/* .nav-item:hover {
-  border-top: 2px solid white;
-  border-top-width: 2px;
-} */
+.border-1{
+  border-width: 1px;
+}
