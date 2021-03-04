@@ -5,10 +5,10 @@ function navbar() {
   return (
     <React.Fragment>
       <header>
-        <div className="hidden md:flex py-5 px-16 flex justify-between justify-items-center">
+        <div className="hidden md:flex py-6 px-10 flex justify-between justify-items-center">
           <div className="flex-initial flex">
-            <h3 className="text-primary text-3xl font-sans font-bold">Le</h3>
-            <h3 className="text-secondary text-3xl  font-sans font-bold">
+            <h3 className="text-primary text-4xl font-sans font-bold">Le</h3>
+            <h3 className="text-secondary text-4xl  font-sans font-bold">
               Lang
             </h3>
           </div>
