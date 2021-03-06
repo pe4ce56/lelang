@@ -165,11 +165,11 @@ function DetailProduct() {
               className="text-secondary py-2 px-4 text-lg w-full focus:outline-none rounded-full border-radius-5 border-color2 border-1"
               placeholder="Penawaran (Rp)"
             />
-            <button className="mt-2 focus:outline-none rounded-full text-lg p-3  w-full bg-primary text-white hover:bg-white hover:text-primary border-1 border-primary justify-center items-center cursor-pointer">
+            <button className="mt-2 focus:outline-none rounded-full text-lg p-3  w-full bg-primary text-white hover:bg-white hover:text-primary border-1 border-primary justify-center items-center cursor-pointer  transition delay-100 duration-500 ease-in-out">
               Tawar Sekarang
             </button>
 
-            <button className="mt-4 focus:outline-none rounded-full text-lg p-3  w-full  justify-center items-center cursor-pointer border-1 border-grey-300 text-color3 hover:bg-primary hover:text-white">
+            <button className="mt-4 focus:outline-none rounded-full text-lg p-3  w-full  justify-center items-center cursor-pointer border-1 border-grey-300 text-color3 hover:bg-primary hover:text-white transition delay-100 duration-500 ease-in-out">
               Masukkan ke Wishlist
             </button>
           </div>

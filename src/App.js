@@ -5,6 +5,7 @@ import Footer from "./components/Layouts/Footer";
 import ViewProductByCategory from "./components/Product/ViewProductByCategory";
 import ScrollToTop from "./ScrollToTop";
 import DetailProduct from "./components/Product/DetailProduct";
+import ViewAll from "./components/Product/ViewAll";
 
 function App() {
   return (
@@ -15,7 +16,10 @@ function App() {
         <Route exact path="/">
           <Home />
         </Route>
-        <Route exact path="/product-category/:category">
+        <Route exact path="/products">
+          <ViewAll />
+        </Route>
+        <Route exact path="/products/category/:category">
           <ViewProductByCategory />
         </Route>
         <Route exact path="/products/:product">

@@ -1,7 +1,11 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 
-function navbar() {
+function Navbar() {
+  const { pathname } = useLocation();
+  const arrPath = pathname.split("/");
+  const route = arrPath[1] || "home";
+  console.log(route);
   return (
     <React.Fragment>
       <header>
@@ -13,11 +17,11 @@ function navbar() {
             </h3>
           </div>
           <form method="GET" className="w-1/2">
-            <div class="relative text-gray-600 focus-within:text-gray-400">
-              <span class="absolute inset-y-0 right-0 flex items-center ">
+            <div className="relative text-gray-600 focus-within:text-gray-400">
+              <span className="absolute inset-y-0 right-0 flex items-center ">
                 <button
                   type="submit"
-                  class="focus:outline-none focus:shadow-outline hover:bg-primary  bg-secondary rounded-full h-full w-9 flex justify-center items-center"
+                  className="focus:outline-none focus:shadow-outline hover:bg-primary  bg-secondary rounded-full h-full w-9 flex justify-center items-center"
                 >
                   <svg
                     fill="none"
@@ -26,7 +30,7 @@ function navbar() {
                     stroke-linejoin="round"
                     stroke-width="2"
                     viewBox="0 0 24 24"
-                    class="w-5 h-5 text-white"
+                    className="w-5 h-5 text-white"
                   >
                     <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                   </svg>
@@ -35,7 +39,7 @@ function navbar() {
               <input
                 type="text"
                 name="q"
-                class="py-2 text-xs text-color2 rounded-md pr-10 pl-2 focus:outline-none focus:bg-white focus:text-gray-900 rounded-full border-2 border-color2  w-full"
+                className="py-2 text-xs text-color2 rounded-md pr-10 pl-2 focus:outline-none focus:bg-white focus:text-gray-900 rounded-full border-2 border-color2  w-full"
                 placeholder="Search..."
                 autocomplete="off"
               />
@@ -87,7 +91,10 @@ function navbar() {
           <ul className="px-10 col-span-12 md:col-span-3  md:flex flex-grow  justify-between items-center text-white">
             <li className="nav-item flex flex-col justify-center group">
               <div
-                className="opacity-1-- group-hover:opacity-100 w-1/2  bg-white self-center"
+                className={
+                  (route == "home" ? "opacity-100" : "opacity-0") +
+                  " group-hover:opacity-100 w-1/2  bg-white self-center"
+                }
                 style={{ height: 2 }}
               ></div>
               <Link
@@ -97,40 +104,22 @@ function navbar() {
                 Home
               </Link>
             </li>
-            <li class="nav-item dropdown inline px-4 cursor-pointer uppercase tracking-wide relative flex flex-col justify-center group">
+            <li className="nav-item inline px-4 cursor-pointer uppercase tracking-wide relative flex flex-col justify-center group">
               <div
-                className="opacity-0 group-hover:opacity-100 w-1/2  bg-white self-center"
+                className={
+                  (route == "products" ? "opacity-100" : "opacity-0") +
+                  " group-hover:opacity-100 w-1/2  bg-white self-center"
+                }
                 style={{ height: 2 }}
               ></div>
-              <a className="px-3 py-2 flex items-center text-xs uppercase  font-normal leading-snug text-white group-hover:font-bold">
+              <Link
+                className="px-3 py-2 flex items-center text-xs uppercase  font-normal leading-snug text-white group-hover:font-bold"
+                to="/products"
+              >
                 Lelang
-              </a>
-              <div class=" dropdown-menu transition ease-in duration-700 md:top-7 md:absolute hidden h-auto w-96 flex pt-4 shadow-lg ">
-                <ul class="block w-full bg-white shadow p-8">
-                  <li class="py-1">
-                    <a class="block text-secondary font-bold text-color2 uppercase hover:text-color3 cursor-pointer">
-                      Item
-                    </a>
-                  </li>
-                  <li class="py-1">
-                    <a class="block text-secondary font-bold text-color2 uppercase hover:text-color3  cursor-pointer">
-                      Item 2
-                    </a>
-                  </li>
-                  <li class="py-1">
-                    <a class="block text-secondary font-bold text-color2 uppercase hover:text-color3 cursor-pointer">
-                      Item 3
-                    </a>
-                  </li>
-                  <li class="py-1">
-                    <a class="block text-secondary font-bold text-color2 uppercase hover:text-color3 cursor-pointer">
-                      Item 4
-                    </a>
-                  </li>
-                </ul>
-              </div>
+              </Link>
             </li>
-            <li class="nav-item flex flex-col justify-center group">
+            <li className="nav-item flex flex-col justify-center group">
               <div
                 className="opacity-0 group-hover:opacity-100 w-1/2  bg-white self-center"
                 style={{ height: 2 }}
@@ -142,7 +131,7 @@ function navbar() {
                 Tentang
               </a>
             </li>
-            <li class="nav-item flex flex-col justify-center group">
+            <li className="nav-item flex flex-col justify-center group">
               <div
                 className="opacity-0 group-hover:opacity-100 w-1/2  bg-white self-center"
                 style={{ height: 2 }}
@@ -170,4 +159,4 @@ function navbar() {
   );
 }
 
-export default navbar;
+export default Navbar;

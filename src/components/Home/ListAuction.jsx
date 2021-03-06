@@ -11,7 +11,7 @@ function ListAuction() {
           <p className=" font-bold text-3xl">Handphone</p>
           <p className=" text-xl">9 Produk</p>
           <Link
-            to="/product-category/phones"
+            to="/products/category/phones"
             className="border-2 border-color-white px-8 py-2  text-xl mt-2 rounded-full hover:bg-white hover:text-primary"
           >
             Lihat Semua
