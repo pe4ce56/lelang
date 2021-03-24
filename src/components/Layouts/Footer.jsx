@@ -35,7 +35,7 @@ function Footer() {
                 name="q"
                 class="py-2 text-base text-color2 rounded-md pr-10 pl-2 focus:outline-none focus:bg-white focus:text-gray-900 rounded-full w-full"
                 placeholder="Search..."
-                autocomplete="off"
+                autoComplete="off"
               />
             </div>
           </form>

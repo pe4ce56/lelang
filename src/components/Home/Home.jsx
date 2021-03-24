@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import ModalLogin from "../Layouts/ModalLogin";
 import LatestAuction from "./LatestAuction";
 import ListAuction from "./ListAuction";
 function Home() {

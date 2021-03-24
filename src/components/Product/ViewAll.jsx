@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { API } from "./../../config/config";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowRight,
@@ -9,11 +10,21 @@ import { useParams } from "react-router-dom";
 
 import ListView from "../Layouts/ListView";
 import GridView from "../Layouts/GridView";
+import axios from "axios";
 
 function ViewAll() {
   const { category } = useParams();
   const [view, setView] = useState("grid");
-
+  const [auctions, setAuctions] = useState([]);
+  useEffect(() => {
+    axios(`${API}/api/auctions`)
+      .then((res) => {
+        setAuctions(res.data.data);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }, []);
   return (
     <section className="px-2 md:px-10">
       <div className="py-6">
@@ -94,14 +105,16 @@ function ViewAll() {
 
           {view === "grid" ? (
             <div className="grid grid-cols-12 mt-2 w-full gap-4 mt-4">
-              {[1, 2, 3, 4].map((e) => (
-                <div className="col-span-6 lg:col-span-4">
-                  <GridView />
-                </div>
-              ))}
+              {auctions &&
+                auctions.map((data) => (
+                  <div className="col-span-6 lg:col-span-4" key={data}>
+                    <GridView data={data} />
+                  </div>
+                ))}
             </div>
           ) : (
-            [1, 2, 3, 3].map(() => <ListView />)
+            auctions &&
+            auctions.map((data) => <ListView key={data} data={data} />)
           )}
 
           <div className="paginataion flex gap-8 mt-6">

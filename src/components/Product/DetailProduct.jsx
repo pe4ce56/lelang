@@ -3,15 +3,30 @@ import {
   faPaperPlane,
   faSearch,
 } from "@fortawesome/free-solid-svg-icons";
-import { faHeart } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import Countdown from "react-countdown";
 import { useParams } from "react-router-dom";
+import axios from "axios";
+import parse from "html-react-parser";
+
+import { API } from "../../config/config";
+import formatRupiah from "../../config/helper";
+import { data } from "autoprefixer";
 
 function DetailProduct() {
-  const { product } = useParams();
+  const { auction_id } = useParams();
   const [subMenu, setSubMenu] = useState("description");
+  const [auction, setAuction] = useState({});
+  useEffect(() => {
+    axios(`${API}/api/auctions/${auction_id}`).then((res) => {
+      setAuction(res.data.data);
+      console.log(auction);
+    });
+  }, []);
+
+  const [imageActive, setImageActive] = useState(0);
+
   const HistoryAuctions = () => (
     <table className="w-full border-gray-300 " style={{ borderWidth: 1 }}>
       <thead>
@@ -92,9 +107,11 @@ function DetailProduct() {
   return (
     <section className="px-4 md:px-10 py-6">
       <div className="mb-10">
-        <p className="text-mont text-base text-color2">Lelang / {product}</p>
+        <p className="text-mont text-base text-color2">
+          Lelang / {auction.item_name}
+        </p>
         <p className="text-mont font-bold text-3xl text-secondary capitalize">
-          {product}
+          {auction.item_name}
         </p>
       </div>
       <hr />
@@ -104,53 +121,59 @@ function DetailProduct() {
           <div className="h-96 shadow-xl flex justify-center items-center">
             <img
               class="object-contain w-5/8 h-60"
-              src="/image/headphone1.jpg"
+              src={
+                imageActive
+                  ? imageActive
+                  : auction.images &&
+                    `${API}/items_image/${auction.item_id}/${auction.images[0].path}`
+              }
               alt="Sunset in the mountains"
             />
           </div>
           <div className="flex mt-6 cursor-pointer">
-            <img
-              class="object-contain w-auto h-20"
-              src="/image/headphone1.jpg"
-              alt="Sunset in the mountains"
-            />
-            <img
-              class="object-contain w-auto h-20"
-              src="/image/headphone1.jpg"
-              alt="Sunset in the mountains"
-            />
-            <img
-              class="object-contain w-auto h-20"
-              src="/image/headphone1.jpg"
-              alt="Sunset in the mountains"
-            />
+            {auction.images &&
+              auction.images.map((image, index) => (
+                <img
+                  key={index}
+                  onClick={() =>
+                    setImageActive(
+                      `${API}/items_image/${auction.item_id}/${image.path}`
+                    )
+                  }
+                  className="object-contain w-auto h-20"
+                  src={`${API}/items_image/${auction.item_id}/${image.path}`}
+                  alt="Sunset in the mountains"
+                />
+              ))}
           </div>
         </div>
         {/*Deskripsi */}
         <div className="col-span-12 lg:col-span-6">
-          <p className="text-base text-color2 text-mont ">
-            Samsung Galaxy S9 smartphone was launched in March 2018. The phone
-            comes with a 5.80-inch touchscreen display with a resolution of 1440
-            pixels by 2960 pixels at a PPI of 568 pixels per inch. Samsung
-            Galaxy S9 price in India starts from Rs. 51,990.
-            <br />
-            <br />
-            The Samsung Galaxy S9 runs Android 8.0 and is powered by a 3000mAh
-            non removable battery. It measures 147.70 x 68.70 x 8.50 (height x
-            width x thickness) and weighs 163.00 grams.
+          <p className="text-base text-color2 text-mont">
+            {auction.description && parse(auction.description)}
           </p>
           <p className="text-lg text-secondary font-bold text-2xl mt-4 mb-6">
-            Current bid: Rp. 78.00
+            Current bid: {auction.price && formatRupiah(auction.price, "Rp. ")}
           </p>
           <hr />
 
           <p className="mt-6 text-base text-color2">Kondisi Produk: baru</p>
           <p className="mt-2 text-base text-color3">Sisa Waktu:</p>
           <div className="py-2 h-20  w-full grid grid-flow-col grid-cols-4 shadow-lg  divide-x items-center">
-            <Countdown date={Date.now() + 10000} renderer={countDownView} />
+            <Countdown
+              date={new Date(auction.end_date)}
+              renderer={countDownView}
+            />
           </div>
           <p className="mt-4 text-base text-color3">
-            Lelang berakhir: 30 juni 2021 12:00 am
+            Lelang berakhir:{" "}
+            {auction.end_date
+              ? new Intl.DateTimeFormat("id").format(
+                  new Date(auction.end_date)
+                ) +
+                " " +
+                new Date(auction.end_date).toLocaleTimeString()
+              : "-"}
           </p>
           <div className="relative w-auto mt-4">
             {/*

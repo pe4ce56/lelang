@@ -1,10 +1,23 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGavel, faSearch } from "@fortawesome/free-solid-svg-icons";
+import {
+  faGavel,
+  faSearch,
+  faHeart as faHeartActive,
+} from "@fortawesome/free-solid-svg-icons";
 import { faHeart } from "@fortawesome/free-regular-svg-icons";
 import Countdown from "react-countdown";
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { Link } from "react-router-dom";
-function GridView() {
+import { connect } from "react-redux";
+
+import { API } from "../../config/config";
+import ModalQuickView from "../Layouts/ModalQuickView";
+import actionType from "../../redux/reducer/globalType";
+import formatRupiah from "../../config/helper";
+
+function GridView(props) {
+  const { wishlist, toggleWishlist, showQuickView, quickView, data } = props;
+
   const countDownView = ({ days, hours, minutes, seconds, completed }) => (
     <Fragment>
       <div className="grid-span-1 text-center">
@@ -32,49 +45,90 @@ function GridView() {
     </Fragment>
   );
   return (
-    <div className="relative max-w-full overflow-hidden shadow-lg pt-5 ">
-      <div className="absolute top-10 left-4">
-        <div className="rounded-full bg-primary text-white w-8 h-8 flex justify-center items-center shadow-md cursor-pointer">
-          <FontAwesomeIcon icon={faGavel} size="md" />
-        </div>
-        <div className="rounded-full bg-white text-color2 hover:bg-primary hover:text-white w-8 h-8 flex justify-center items-center shadow-md cursor-pointer mt-5">
-          <FontAwesomeIcon icon={faHeart} size="md" />
-        </div>
+    <Fragment>
+      {quickView && <ModalQuickView />}
+      <div className="relative max-w-full overflow-hidden shadow-lg pt-5 ">
+        <div className="absolute top-10 left-4">
+          <Link to="/products/phone">
+            <div className="rounded-full bg-primary text-white w-8 h-8 flex justify-center items-center shadow-md cursor-pointer">
+              <FontAwesomeIcon icon={faGavel} />
+            </div>
+          </Link>
+          <div
+            onClick={() => toggleWishlist(data.auctions_id)}
+            className={
+              (wishlist.find((result) => result.auction_id == data.auctions_id)
+                ? "bg-primary text-white "
+                : "bg-white text-color2 ") +
+              "rounded-full hover:bg-primary hover:text-white w-8 h-8 flex justify-center items-center shadow-md cursor-pointer mt-5"
+            }
+          >
+            <FontAwesomeIcon
+              icon={
+                wishlist.find((result) => result.auction_id == data.auctions_id)
+                  ? faHeartActive
+                  : faHeart
+              }
+            />
+          </div>
 
-        <Link to="/products/phone">
-          <div className="rounded-full bg-white text-color2 hover:bg-primary hover:text-white w-8 h-8 flex justify-center items-center shadow-md cursor-pointer mt-5">
-            <FontAwesomeIcon icon={faSearch} size="md" />
+          <button
+            onClick={() => showQuickView(data.auctions_id)}
+            className="focus:outline-none rounded-full bg-white text-color2 hover:bg-primary hover:text-white w-8 h-8 flex justify-center items-center shadow-md cursor-pointer mt-5"
+          >
+            <FontAwesomeIcon icon={faSearch} />
+          </button>
+        </div>
+        <Link to={`/products/${data.auctions_id}`}>
+          <div className="h-72 z-0">
+            <img
+              className="object-contain w-3/4 h-60 mx-auto z-0"
+              src={`${API}/items_image/${data.item_id}/${data.images[0].path}`}
+              alt="Sunset in the mountains"
+            />
+          </div>
+          {data.end_date && (
+            <div className="w-full absolute top-56 md:px-4">
+              <div className="py-2  w-auto grid grid-flow-col grid-cols-4 shadow-md  divide-x ">
+                <Countdown
+                  date={new Date(data.end_date)}
+                  renderer={countDownView}
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="px-2 py-2 border-t-2 border-color1">
+            <div className="font-bold text-xl text-secondary mb-2 text-center font-mont">
+              {data.item_name}
+            </div>
+            <div className="mb-2 flex justify-center">
+              <p className="text-color2 text-sm font-mont">Tawaran: </p>
+              <p className="text-secondary font-bold text-sm font-mont">
+                {formatRupiah(data.price, "RP. ")}
+              </p>
+            </div>
           </div>
         </Link>
       </div>
-      <Link to="/products/test">
-        <div className="h-72 z-0">
-          <img
-            class="object-contain w-3/4 h-60 mx-auto z-0"
-            src="/image/headphone1.jpg"
-            alt="Sunset in the mountains"
-          />
-        </div>
-        <div className="w-full absolute top-56 md:px-4">
-          <div className="py-2  w-auto grid grid-flow-col grid-cols-4 shadow-md  divide-x ">
-            <Countdown date={Date.now() + 10000} renderer={countDownView} />
-          </div>
-        </div>
-
-        <div class="px-2 py-2 border-t-2 border-color1">
-          <div class="font-bold text-xl text-secondary mb-2 text-center font-mont">
-            Smartphone Buds
-          </div>
-          <div className="mb-2 flex justify-center">
-            <p class="text-color2 text-sm font-mont">Tawaran:</p>
-            <p className="text-secondary font-bold text-sm font-mont">
-              Rp. 400.000,00
-            </p>
-          </div>
-        </div>
-      </Link>
-    </div>
+    </Fragment>
   );
 }
 
-export default GridView;
+const mapDispatchToProps = (dispatch) => {
+  return {
+    showQuickView: (id) =>
+      dispatch({ type: actionType.SHOW_QUICK_VIEW, value: id }),
+    toggleWishlist: (id) =>
+      dispatch({ type: actionType.TOGGLE_WISHLIST, value: id }),
+  };
+};
+
+const mapStateToProps = (state) => {
+  return {
+    quickView: state.quickView.show,
+    wishlist: state.wishlist,
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(GridView);

@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css?family=Nunito:400,700&display=swap");
+@import url("https://fonts.googleapis.com/css?family=Montserrat:wght@400;700;800&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -8,6 +8,6 @@
   display: block;
 }
 
-.border-1{
+.border-1 {
   border-width: 1px;
 }

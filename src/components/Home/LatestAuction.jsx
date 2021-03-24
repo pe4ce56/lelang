@@ -15,8 +15,8 @@ function LatestAuction() {
       </div>
       <div className="grid grid-cols-12 px-4 md:px-10 mt-2 w-full  gap-4 mt-4">
         {[1, 2, 3, 4].map((e) => (
-          <div className="col-span-6  lg:col-span-3">
-            <GridView />
+          <div className="col-span-6  lg:col-span-3" key={e}>
+            <GridView id={e} />
           </div>
         ))}
       </div>

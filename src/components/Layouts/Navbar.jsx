@@ -1,11 +1,12 @@
 import React from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
-
-function Navbar() {
+import { connect } from "react-redux";
+import actionType from "../../redux/reducer/globalType";
+function Navbar({ wishlistCount, showLogin }) {
   const { pathname } = useLocation();
   const arrPath = pathname.split("/");
   const route = arrPath[1] || "home";
-  console.log(route);
+
   return (
     <React.Fragment>
       <header>
@@ -41,16 +42,18 @@ function Navbar() {
                 name="q"
                 className="py-2 text-xs text-color2 rounded-md pr-10 pl-2 focus:outline-none focus:bg-white focus:text-gray-900 rounded-full border-2 border-color2  w-full"
                 placeholder="Search..."
-                autocomplete="off"
+                autoComplete="off"
               />
             </div>
           </form>
-          <Link to="/" className="flex-initial flex group">
+          <Link to="/wishlist" className="flex-initial flex group">
             <div className="flex-initial">
               <p className="text-secondary text-xs font-bold font-mont">
                 Wishlist
               </p>
-              <p className="text-color2 text-xs font-mont">2 Barang</p>
+              <p className="text-color2 text-xs font-mont">
+                {wishlistCount || 0} Barang
+              </p>
             </div>
             <div className="flex-initial">
               <svg
@@ -145,7 +148,10 @@ function Navbar() {
             </li>
           </ul>
           <div className="col-start-8 col-span-1 flex items-center">
-            <button className="text-white focus:outline-none text-white px-2 py-1 text-sm rounded  mr-3">
+            <button
+              onClick={showLogin}
+              className="text-white focus:outline-none text-white px-2 py-1 text-sm rounded  mr-3"
+            >
               Login
             </button>
             {/*  <button className="bg-danger hover:bg-danger-2 border-2- border-danger focus:outline-none text-white px-2 py-1 text-sm rounded">
@@ -159,4 +165,15 @@ function Navbar() {
   );
 }
 
-export default Navbar;
+const mapStateToProps = (state) => {
+  console.log(state);
+  return {
+    wishlistCount: state.wishlist.length,
+  };
+};
+const mapDispatchToProps = (dispatch) => {
+  return {
+    showLogin: () => dispatch({ type: actionType.TOGGLE_LOGIN }),
+  };
+};
+export default connect(mapStateToProps, mapDispatchToProps)(Navbar);
