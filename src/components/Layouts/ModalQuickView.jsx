@@ -4,13 +4,12 @@ import { connect } from "react-redux";
 import actionType from "../../redux/reducer/globalType";
 
 import { API } from "../../config/config";
-import formatRupiah from "../../config/helper";
+import { formatRupiah } from "../../config/helper";
 function ModalQuickView({ hideModal, id }) {
   //get Data auction
   const [auction, setAuctions] = useState({});
   useEffect(() => {
     axios(`${API}/API/auctions/${id}`).then((res) => {
-      console.log(res);
       setAuctions(res.data.data);
     });
   }, []);

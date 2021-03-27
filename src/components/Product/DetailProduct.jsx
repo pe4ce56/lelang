@@ -5,27 +5,95 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Fragment, useEffect, useState } from "react";
+import { connect } from "react-redux";
 import Countdown from "react-countdown";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import parse from "html-react-parser";
+import { io } from "socket.io-client";
 
 import { API } from "../../config/config";
-import formatRupiah from "../../config/helper";
-import { data } from "autoprefixer";
+import { formatDate, formatRupiah } from "../../config/helper";
+import actionType from "../../redux/reducer/globalType";
 
-function DetailProduct() {
+function DetailProduct({ wishlist, toggleWishlist }) {
+  // socket
+  const socket = io(API);
+
   const { auction_id } = useParams();
+  // to handle sub menu {description, bid}
   const [subMenu, setSubMenu] = useState("description");
+  // to handle data auction
   const [auction, setAuction] = useState({});
   useEffect(() => {
     axios(`${API}/api/auctions/${auction_id}`).then((res) => {
       setAuction(res.data.data);
-      console.log(auction);
     });
   }, []);
-
+  // to handle image
   const [imageActive, setImageActive] = useState(0);
+  const [auctionHistories, setAuctionHistories] = useState([]);
+  useEffect(() => {
+    axios(`${API}/api/auctions/bid/${auction_id}`).then((res) => {
+      setAuctionHistories(res.data.data);
+      console.log(res.data.data);
+    });
+  }, []);
+  const [bidValue, setBidValue] = useState("");
+  const handleBid = () => {
+    if (auction.status === "close") return;
+    const data = {
+      auction_id,
+      client_id: 1,
+      offers: bidValue,
+    };
+    axios(`${API}/api/auctions/bid/`, {
+      method: "POST",
+      data,
+    })
+      .then((res) => {
+        setBidValue("");
+        socket.emit("bid");
+      })
+      .catch((e) => {
+        setBidValue("");
+      });
+  };
+  const [comments, setComments] = useState([]);
+  useEffect(() => {
+    axios(`${API}/api/auctions/comments/${auction_id}`).then((res) => {
+      setComments(res.data.data);
+    });
+  }, []);
+  const [commentValue, setCommentValue] = useState("");
+  const handleComment = (e) => {
+    e.preventDefault();
+    const data = {
+      auction_id,
+      client_id: 1,
+      text: commentValue,
+    };
+    axios(`${API}/api/auctions/comment/`, {
+      method: "POST",
+      data,
+    }).then((res) => {
+      setCommentValue("");
+      socket.emit("comment");
+    });
+  };
+
+  // run when new bid
+  socket.on("bidChanged", () => {
+    axios(`${API}/api/auctions/bid/${auction_id}`).then((res) => {
+      setAuctionHistories(res.data.data);
+    });
+  });
+  // run when new comment
+  socket.on("commentChanged", () => {
+    axios(`${API}/api/auctions/comments/${auction_id}`).then((res) => {
+      setComments(res.data.data);
+    });
+  });
 
   const HistoryAuctions = () => (
     <table className="w-full border-gray-300 " style={{ borderWidth: 1 }}>
@@ -43,17 +111,24 @@ function DetailProduct() {
         </tr>
       </thead>
       <tbody className="text-color3 text-mont">
-        {[1, 2, 3, 4, 5].map(() => (
-          <tr>
-            <td className="px-3 py-2">February 27, 2021 09:51:04 pm</td>
-            <td className="px-3 py-2 font-bold text-grey-600">$913.00</td>
-            <td className="px-3 py-2">Damai Deo Saputro</td>
-          </tr>
-        ))}
+        {auctionHistories[0].created_at &&
+          auctionHistories.map((history, index) => (
+            <tr key={index}>
+              <td className="px-3 py-2">{formatDate(history.created_at)}</td>
+              <td className="px-3 py-2 font-bold text-grey-600">
+                {formatRupiah(history.offers, "Rp.")}
+              </td>
+              <td className="px-3 py-2">{history.name}</td>
+            </tr>
+          ))}
         <tr>
-          <td className="px-3 py-2">October 1, 2019 12:00:00 am</td>
+          <td className="px-3 py-2">
+            {formatDate(auctionHistories[0].start_date)}
+          </td>
           <td className="px-3 py-2 text-color3">Lelang Dimulai</td>
-          <td />
+          <td className="px-3 py-2 font-bold text-grey-600">
+            {formatRupiah(auctionHistories[0].price, "Rp.")}
+          </td>
         </tr>
       </tbody>
     </table>
@@ -88,23 +163,25 @@ function DetailProduct() {
     </Fragment>
   );
 
-  const Comment = () => (
-    <div className="flex mt-8 mx-10">
-      <img
-        className="object-contain w-14 h-14 rounded-full"
-        src="/profile/profile1.jpeg"
-      />
-      <div className="ml-3">
-        <p className="text-color4 text-2xl">Edmund Tate</p>
-        <p className="text-base text-color3">January 20, 2020 at 8:31 pm</p>
-        <p className="text-base mt-2">
-          Maecenas at turpis ut lacus posuere dapibus. Fusce et sollicitudin
-          libero, id vehicula sem. Morbi pharetra nisl eget malesuada.
-        </p>
+  const Comment = ({ comment }) =>
+    comment.client_id && (
+      <div className="flex mt-8 mx-10">
+        <div className="pt-2">
+          <img
+            className="object-contain w-10 h-10 rounded-full"
+            src="/profile/profile1.jpeg"
+          />
+        </div>
+        <div className="ml-3">
+          <p className="text-color4 text-xl">{comment.name}</p>
+          <p className="text-sm text-color3">
+            {formatDate(comment.created_at)}
+          </p>
+          <p className="text-base mt-2">{comment.text}</p>
+        </div>
       </div>
-    </div>
-  );
-  return (
+    );
+  return auction.auctions_id ? (
     <section className="px-4 md:px-10 py-6">
       <div className="mb-10">
         <p className="text-mont text-base text-color2">
@@ -120,7 +197,7 @@ function DetailProduct() {
         <div className="col-span-12 lg:col-span-5">
           <div className="h-96 shadow-xl flex justify-center items-center">
             <img
-              class="object-contain w-5/8 h-60"
+              className="object-contain w-5/8 h-60"
               src={
                 imageActive
                   ? imageActive
@@ -153,11 +230,14 @@ function DetailProduct() {
             {auction.description && parse(auction.description)}
           </p>
           <p className="text-lg text-secondary font-bold text-2xl mt-4 mb-6">
-            Current bid: {auction.price && formatRupiah(auction.price, "Rp. ")}
+            Penawaran Tertinggi:{" "}
+            {auctionHistories.length && auctionHistories[0].current_bid
+              ? formatRupiah(auctionHistories[0].current_bid, "Rp. ")
+              : formatRupiah(auction.price, "Rp. ")}
           </p>
           <hr />
 
-          <p className="mt-6 text-base text-color2">Kondisi Produk: baru</p>
+          {/*<p className="mt-6 text-base text-color2">Kondisi Produk: baru</p>*/}
           <p className="mt-2 text-base text-color3">Sisa Waktu:</p>
           <div className="py-2 h-20  w-full grid grid-flow-col grid-cols-4 shadow-lg  divide-x items-center">
             <Countdown
@@ -167,13 +247,7 @@ function DetailProduct() {
           </div>
           <p className="mt-4 text-base text-color3">
             Lelang berakhir:{" "}
-            {auction.end_date
-              ? new Intl.DateTimeFormat("id").format(
-                  new Date(auction.end_date)
-                ) +
-                " " +
-                new Date(auction.end_date).toLocaleTimeString()
-              : "-"}
+            {auction.end_date ? formatDate(auction.end_date) : "-"}
           </p>
           <div className="relative w-auto mt-4">
             {/*
@@ -185,15 +259,34 @@ function DetailProduct() {
             </span>
              */}
             <input
+              value={bidValue}
+              onChange={(e) => setBidValue(e.target.value)}
               className="text-secondary py-2 px-4 text-lg w-full focus:outline-none rounded-full border-radius-5 border-color2 border-1"
               placeholder="Penawaran (Rp)"
             />
-            <button className="mt-2 focus:outline-none rounded-full text-lg p-3  w-full bg-primary text-white hover:bg-white hover:text-primary border-1 border-primary justify-center items-center cursor-pointer  transition delay-100 duration-500 ease-in-out">
+            <button
+              onClick={handleBid}
+              className="mt-2 focus:outline-none rounded-full text-lg p-3  w-full bg-primary text-white hover:bg-white hover:text-primary border-1 border-primary justify-center items-center cursor-pointer  transition delay-100 duration-500 ease-in-out"
+            >
               Tawar Sekarang
             </button>
 
-            <button className="mt-4 focus:outline-none rounded-full text-lg p-3  w-full  justify-center items-center cursor-pointer border-1 border-grey-300 text-color3 hover:bg-primary hover:text-white transition delay-100 duration-500 ease-in-out">
-              Masukkan ke Wishlist
+            <button
+              onClick={() => toggleWishlist(auction.auctions_id)}
+              className={
+                (wishlist.find(
+                  (result) => result.auction_id == auction.auctions_id
+                )
+                  ? "bg-primary text-white hover:bg-white hover:text-primary "
+                  : "text-color3 hover:bg-primary hover:text-white ") +
+                "mt-4 focus:outline-none rounded-full text-lg p-3  w-full  justify-center items-center cursor-pointer border-1 border-grey-300  transition delay-100 duration-500 ease-in-out"
+              }
+            >
+              {wishlist.find(
+                (result) => result.auction_id == auction.auctions_id
+              )
+                ? "Hapus dari Wishlist"
+                : "Masukkan ke Wishlist"}
             </button>
           </div>
         </div>
@@ -225,42 +318,52 @@ function DetailProduct() {
       <div className="mt-6 ">
         {subMenu == "description" ? (
           <p className="text-base text-color3">
-            The Ragdoll is a cat breed with blue eyes and a distinct colorpoint
-            coat. It is a large and muscular semi-longhair cat with a soft and
-            silky coat. Like all long haired cats, Ragdolls need grooming to
-            ensure their fur does not mat. Developed by American breeder Ann
-            Baker in the 1960s, it is best known for its docile and placid
-            temperament and affectionate nature. The name “Ragdoll” is derived
-            from the tendency of individuals from the original breeding stock to
-            go limp and relaxed when picked up.
+            {auction.description && parse(auction.description)}
           </p>
         ) : (
-          <HistoryAuctions />
+          auctionHistories && <HistoryAuctions />
         )}
       </div>
 
       {/* komen*/}
-      <div className="shadow-lg w-full mt-2 py-7 px-3 md:px-7 flex flex-col">
-        <form className="grid grid-cols-12">
+      <div className="shadow-lg w-full mt-2 py-7 px-3 md:px-7 flex flex-col ">
+        <form onSubmit={handleComment} className="grid grid-cols-12">
           <input
+            value={commentValue}
+            onChange={(e) => setCommentValue(e.target.value)}
             placeholder="Tambahkan komentar"
             className="col-span-11 w-full focus:outline-none text-xl p-3 border-grey-500 focus:border-primary hover:border-primary border-1"
           />
-          <button className="col-span-1 w-full focus:outline-none bg-primary text-white hover:bg-white hover:text-primary">
-            Kirim <FontAwesomeIcon icon={faPaperPlane} size="xl" />
+          <button
+            type="submit"
+            className="col-span-1 w-full focus:outline-none bg-primary text-white hover:bg-white hover:text-primary"
+          >
+            Kirim <FontAwesomeIcon icon={faPaperPlane} size="1x" />
           </button>
         </form>
 
-        {[1, 2, 3, 4, 5].map(() => (
-          <Comment />
+        {comments.map((comment, index) => (
+          <Comment comment={comment} key={index} />
         ))}
 
-        <button className="mx-auto w-4/5 mt-6 py-3 rounded-full capitalize text-xl text-color4 bg-blue-100  focus:outline-none hover:text-secondary hover:bg-blue-200">
+        {/* <button className="mx-auto w-4/5 mt-6 py-3 rounded-full capitalize text-xl text-color4 bg-blue-100  focus:outline-none hover:text-secondary hover:bg-blue-200">
           Lihat komentar lebih
         </button>
+        */}
       </div>
     </section>
+  ) : (
+    "loading"
   );
 }
+const mapDispatchToProps = (dispatch) => {
+  return {
+    toggleWishlist: (id) =>
+      dispatch({ type: actionType.TOGGLE_WISHLIST, value: id }),
+  };
+};
+const mapStateToProps = (state) => ({
+  wishlist: state.wishlist,
+});
 
-export default DetailProduct;
+export default connect(mapStateToProps, mapDispatchToProps)(DetailProduct);

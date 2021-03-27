@@ -13,11 +13,10 @@ import { connect } from "react-redux";
 import { API } from "../../config/config";
 import ModalQuickView from "../Layouts/ModalQuickView";
 import actionType from "../../redux/reducer/globalType";
-import formatRupiah from "../../config/helper";
+import { formatRupiah } from "../../config/helper";
 
 function GridView(props) {
   const { wishlist, toggleWishlist, showQuickView, quickView, data } = props;
-
   const countDownView = ({ days, hours, minutes, seconds, completed }) => (
     <Fragment>
       <div className="grid-span-1 text-center">
@@ -44,7 +43,7 @@ function GridView(props) {
       </div>
     </Fragment>
   );
-  return (
+  return data ? (
     <Fragment>
       {quickView && <ModalQuickView />}
       <div className="relative max-w-full overflow-hidden shadow-lg pt-5 ">
@@ -87,7 +86,7 @@ function GridView(props) {
               alt="Sunset in the mountains"
             />
           </div>
-          {data.end_date && (
+          {data.end_date && data.status == "open" ? (
             <div className="w-full absolute top-56 md:px-4">
               <div className="py-2  w-auto grid grid-flow-col grid-cols-4 shadow-md  divide-x ">
                 <Countdown
@@ -96,8 +95,15 @@ function GridView(props) {
                 />
               </div>
             </div>
+          ) : (
+            <div className="w-full absolute top-56 md:px-4">
+              <div className="py-5  w-auto shadow-md  divide-x ">
+                <p className="text-center text-xl text-grey-200">
+                  Lelang Ditutup
+                </p>
+              </div>
+            </div>
           )}
-
           <div className="px-2 py-2 border-t-2 border-color1">
             <div className="font-bold text-xl text-secondary mb-2 text-center font-mont">
               {data.item_name}
@@ -112,6 +118,8 @@ function GridView(props) {
         </Link>
       </div>
     </Fragment>
+  ) : (
+    <div>Loading</div>
   );
 }
 

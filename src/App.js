@@ -21,7 +21,7 @@ function App({ toggleLogin, fetchWishlist }) {
     axios(`${API}/api/auctions/wishlist/1`).then((res) => {
       fetchWishlist(res.data.data);
     });
-  });
+  }, []);
   return (
     <React.Fragment>
       {toggleLogin && <ModalLogin />}

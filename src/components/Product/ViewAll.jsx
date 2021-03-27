@@ -17,13 +17,9 @@ function ViewAll() {
   const [view, setView] = useState("grid");
   const [auctions, setAuctions] = useState([]);
   useEffect(() => {
-    axios(`${API}/api/auctions`)
-      .then((res) => {
-        setAuctions(res.data.data);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+    axios(`${API}/api/auctions`).then((res) => {
+      setAuctions(res.data.data);
+    });
   }, []);
   return (
     <section className="px-2 md:px-10">
@@ -105,16 +101,16 @@ function ViewAll() {
 
           {view === "grid" ? (
             <div className="grid grid-cols-12 mt-2 w-full gap-4 mt-4">
-              {auctions &&
-                auctions.map((data) => (
-                  <div className="col-span-6 lg:col-span-4" key={data}>
+              {auctions.length !== 0 &&
+                auctions.map((data, index) => (
+                  <div className="col-span-6 lg:col-span-4" key={index}>
                     <GridView data={data} />
                   </div>
                 ))}
             </div>
           ) : (
-            auctions &&
-            auctions.map((data) => <ListView key={data} data={data} />)
+            auctions.length !== 0 &&
+            auctions.map((data, index) => <ListView key={index} data={data} />)
           )}
 
           <div className="paginataion flex gap-8 mt-6">

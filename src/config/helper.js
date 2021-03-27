@@ -17,4 +17,11 @@ const formatRupiah = (angka, prefix) => {
   rupiah = split[1] != undefined ? rupiah + "," + split[1] : rupiah;
   return prefix == undefined ? rupiah : rupiah ? "Rp. " + rupiah : "";
 };
-module.exports = formatRupiah;
+const formatDate = (date) => {
+  return (
+    new Intl.DateTimeFormat("id").format(new Date(date)) +
+    " " +
+    new Date(date).toLocaleTimeString()
+  );
+};
+module.exports = { formatRupiah, formatDate };
