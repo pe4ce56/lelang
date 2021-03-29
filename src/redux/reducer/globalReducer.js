@@ -71,6 +71,7 @@ const rootReducer = (state = globalState, action) => {
         wishlist: action.value,
       };
     }
+
     default:
       return state;
   }

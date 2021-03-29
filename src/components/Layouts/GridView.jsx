@@ -48,7 +48,7 @@ function GridView(props) {
       {quickView && <ModalQuickView />}
       <div className="relative max-w-full overflow-hidden shadow-lg pt-5 ">
         <div className="absolute top-10 left-4">
-          <Link to="/products/phone">
+          <Link to={`/products/${data.auctions_id}`}>
             <div className="rounded-full bg-primary text-white w-8 h-8 flex justify-center items-center shadow-md cursor-pointer">
               <FontAwesomeIcon icon={faGavel} />
             </div>

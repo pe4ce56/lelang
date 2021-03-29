@@ -33,8 +33,7 @@ function Wishlist(props) {
   }, [wishstate]);
 
   const List = (wish) => (
-    <Link
-      to={`/products/${wish.auction_id}`}
+    <div
       className="shadow-lg w-full py-6 px-6 grid grid-cols-12 items-center relative mt-10"
     >
       <div className="h-30 col-span-12 md:col-span-1">
@@ -54,6 +53,12 @@ function Wishlist(props) {
         >
           Quick View
         </button>
+        <Link
+        to={`/products/${wish.auction_id}`}
+          className="md:ml-3 focus:outline-none rounded-full bg-primary py-2 px-3 text-white text-sm font-bold md:w-auto w-1/2 -center"
+        >
+          Tawar Sekarang
+        </Link>
       </div>
       <div className="absolute top-0 right-0 md:relative md:col-span-1 md:col-start-12">
         <button
@@ -63,8 +68,9 @@ function Wishlist(props) {
           <FontAwesomeIcon icon={faTrash} size="lg" />
         </button>
       </div>
-    </Link>
+    </div>
   );
+
 
   return (
     <React.Fragment>
