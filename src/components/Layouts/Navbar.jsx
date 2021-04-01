@@ -1,11 +1,43 @@
-import React from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { connect } from "react-redux";
 import actionType from "../../redux/reducer/globalType";
-function Navbar({ wishlistCount, showLogin }) {
-  const { pathname } = useLocation();
+function Navbar({
+  wishlistCount,
+  showLogin,
+  removeLoginMessage,
+  removeWishlist,
+}) {
+  const { pathname, search } = useLocation();
   const arrPath = pathname.split("/");
   const route = arrPath[1] || "home";
+  const [login, setLogin] = useState(false);
+  const [query, setQuery] = useState("");
+  useEffect(() => {
+    const q = new URLSearchParams(search).get("q");
+    setQuery(q);
+  }, []);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    console.log(token);
+    if (token) {
+      setLogin(true);
+      return;
+    }
+    setLogin(false);
+  });
+
+  const handleAuth = () => {
+    if (!login) {
+      removeLoginMessage();
+      showLogin();
+      return;
+    }
+    removeWishlist();
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setLogin(false);
+  };
 
   return (
     <React.Fragment>
@@ -17,7 +49,7 @@ function Navbar({ wishlistCount, showLogin }) {
               Lang
             </h3>
           </div>
-          <form method="GET" className="w-1/2">
+          <form method="GET" action="/products" className="w-1/2">
             <div className="relative text-gray-600 focus-within:text-gray-400">
               <span className="absolute inset-y-0 right-0 flex items-center ">
                 <button
@@ -27,9 +59,9 @@ function Navbar({ wishlistCount, showLogin }) {
                   <svg
                     fill="none"
                     stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
+                    strokeLinecap="round"
+                    j="round"
+                    strokeWidth="2"
                     viewBox="0 0 24 24"
                     className="w-5 h-5 text-white"
                   >
@@ -38,6 +70,8 @@ function Navbar({ wishlistCount, showLogin }) {
                 </button>
               </span>
               <input
+                onChange={(e) => setQuery(e.target.value)}
+                value={query || ""}
                 type="text"
                 name="q"
                 className="py-2 text-xs text-color2 rounded-md pr-10 pl-2 focus:outline-none focus:bg-white focus:text-gray-900 rounded-full border-2 border-color2  w-full"
@@ -73,8 +107,8 @@ function Navbar({ wishlistCount, showLogin }) {
             </div>
           </Link>
         </div>
-        <nav className="px-10 grid grid-flow-col grid-cols-8 bg-primary h-14 font-mont font-bold text-xs">
-          <button className="flex bg-white col-span-1 justify-center items-center focus:outline-none">
+        <nav className="px-10 flex bg-primary h-14 font-mont font-bold text-xs">
+          <div className="flex bg-white px-6 justify-center items-center focus:outline-none">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -83,15 +117,15 @@ function Navbar({ wishlistCount, showLogin }) {
               className="w-4 mr-2 text-color4"
             >
               <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
                 d="M4 6h16M4 12h16M4 18h16"
               />
             </svg>
             <h6 className="text-color3 font-bold text-base">Kategori</h6>
-          </button>
-          <ul className="px-10 col-span-12 md:col-span-3  md:flex flex-grow  justify-between items-center text-white">
+          </div>
+          <ul className="px-10 col-span-2  md:col-span-3 hidden  md:flex flex-grow items-center text-white">
             <li className="nav-item flex flex-col justify-center group">
               <div
                 className={
@@ -101,7 +135,7 @@ function Navbar({ wishlistCount, showLogin }) {
                 style={{ height: 2 }}
               ></div>
               <Link
-                className="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-white "
+                className="px-3 py-2 flex items-center text-xs font-normal uppercase leading-snug text-white "
                 to="/"
               >
                 Home
@@ -122,38 +156,15 @@ function Navbar({ wishlistCount, showLogin }) {
                 Lelang
               </Link>
             </li>
-            <li className="nav-item flex flex-col justify-center group">
-              <div
-                className="opacity-0 group-hover:opacity-100 w-1/2  bg-white self-center"
-                style={{ height: 2 }}
-              ></div>
-              <a
-                className="px-3 py-2 flex items-center text-xs uppercase font-normal leading-snug text-white "
-                href="#pablo"
-              >
-                Tentang
-              </a>
-            </li>
-            <li className="nav-item flex flex-col justify-center group">
-              <div
-                className="opacity-0 group-hover:opacity-100 w-1/2  bg-white self-center"
-                style={{ height: 2 }}
-              ></div>
-              <a
-                className="px-3 py-2 flex items-center text-xs uppercase  font-normal leading-snug text-white "
-                href="#pablo"
-              >
-                Kontak
-              </a>
-            </li>
           </ul>
           <div className="col-start-8 col-span-1 flex items-center">
             <button
-              onClick={showLogin}
+              onClick={handleAuth}
               className="text-white focus:outline-none text-white px-2 py-1 text-sm rounded  mr-3"
             >
-              Login
+              {login ? "Logout" : "login"}
             </button>
+
             {/*  <button className="bg-danger hover:bg-danger-2 border-2- border-danger focus:outline-none text-white px-2 py-1 text-sm rounded">
                     Register
                   </button>
@@ -166,7 +177,6 @@ function Navbar({ wishlistCount, showLogin }) {
 }
 
 const mapStateToProps = (state) => {
-  console.log(state);
   return {
     wishlistCount: state.wishlist.length,
   };
@@ -174,6 +184,10 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     showLogin: () => dispatch({ type: actionType.TOGGLE_LOGIN }),
+    removeWishlist: () =>
+      dispatch({ type: actionType.FETCH_WISHLIST, value: [] }),
+    removeLoginMessage: (msg) =>
+      dispatch({ type: actionType.SET_LOGIN_MESSAGE, value: "" }),
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Navbar);

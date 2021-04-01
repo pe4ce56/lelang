@@ -1,25 +1,29 @@
 import { useState, useEffect } from "react";
 import { API } from "./../../config/config";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faArrowRight,
-  faBorderAll,
-  faThList,
-} from "@fortawesome/free-solid-svg-icons";
-import { useParams } from "react-router-dom";
-
+import { faBorderAll, faThList } from "@fortawesome/free-solid-svg-icons";
 import ListView from "../Layouts/ListView";
 import GridView from "../Layouts/GridView";
 import axios from "axios";
+import { useLocation } from "react-router";
+import Loading from "../Layouts/Loading";
 
-function ViewAll() {
-  const { category } = useParams();
+function ViewAll({ location }) {
+  const { search } = useLocation();
+  const [query, setQuery] = useState("");
   const [view, setView] = useState("grid");
   const [auctions, setAuctions] = useState([]);
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
-    axios(`${API}/api/auctions`).then((res) => {
-      setAuctions(res.data.data);
-    });
+    const q = new URLSearchParams(search).get("q");
+    setQuery(q);
+
+    axios(q ? `${API}/api/auctions/search/${q}` : `${API}/api/auctions`)
+      .then((res) => {
+        setLoading(true);
+        setAuctions(res.data.data);
+      })
+      .catch((e) => {});
   }, []);
   return (
     <section className="px-2 md:px-10">
@@ -29,21 +33,23 @@ function ViewAll() {
       <hr />
       <div className="grid grid-cols-12 gap-8 mt-5 mb-5">
         <div className="hidden md:block md:col-span-3">
-          <div>
+          <form method="GET" action="/products">
             <p className="text-secondary text-mont font-bold text-2xl mb-2">
               Search Lelang
             </p>
             <hr />
             <input
+              onChange={(e) => setQuery(e.target.value)}
+              value={query || ""}
               type="text"
               name="q"
               className="py-2 text-sm text-color2 rounded-md px-4 focus:outline-none focus:bg-white focus:text-gray-900 rounded-full w-3/4 mt-3"
               placeholder="Search..."
               style={{ borderWidth: 1 }}
-              autocomplete="off"
+              autoComplete="off"
             />
-          </div>
-          <div className="mt-10">
+          </form>
+          {/* <div className="mt-10">
             <p className="text-secondary text-mont font-bold text-2xl mb-2">
               Warna
             </p>
@@ -56,7 +62,7 @@ function ViewAll() {
               <option>Merah</option>
               <option>Merah</option>
             </select>
-          </div>
+          </div> */}
         </div>
         <div className="col-span-12 md:col-span-9">
           <div className="rounded-sm shadow-lg w-full py-4 px-6 flex justify-between h-20">
@@ -85,35 +91,47 @@ function ViewAll() {
               >
                 <FontAwesomeIcon icon={faThList} size="sm" />
               </button>
-              <p className="hidden sm:block text-color3 text-mont text-lg ml-4">
+              {/* <p className="hidden sm:block text-color3 text-mont text-lg ml-4">
                 Showing 1-3 of 10 results
-              </p>
+              </p> */}
             </div>
             <select
               className="px-4 py-2 mt-2 rounded-full w-80 focus:outline-none text-color3"
               style={{ borderWidth: 1 }}
             >
               <option>Default</option>
-              <option>Dari harga: murah ke mahal</option>
-              <option>Dari harga: mahal ke murah</option>
+              {/* <option>Dari harga: murah ke mahal</option>
+              <option>Dari harga: mahal ke murah</option> */}
             </select>
           </div>
-
-          {view === "grid" ? (
-            <div className="grid grid-cols-12 mt-2 w-full gap-4 mt-4">
-              {auctions.length !== 0 &&
+          {loading ? (
+            auctions.length !== 0 ? (
+              view === "grid" ? (
+                <div className="grid grid-cols-12 mt-2 w-full gap-4 mt-4">
+                  {auctions.length !== 0 &&
+                    auctions.map((data, index) => (
+                      <div className="col-span-6 lg:col-span-4" key={index}>
+                        <GridView data={data} />
+                      </div>
+                    ))}
+                </div>
+              ) : (
+                auctions.length !== 0 &&
                 auctions.map((data, index) => (
-                  <div className="col-span-6 lg:col-span-4" key={index}>
-                    <GridView data={data} />
-                  </div>
-                ))}
-            </div>
+                  <ListView key={index} data={data} />
+                ))
+              )
+            ) : (
+              <div className="rounded-sm shadow-lg w-full py-10 px-6  mt-4">
+                <p className="text-3xl font-bold font-mont text-gray-500">
+                  Lelang Tidak Ada {search && ` dengan nama ${query}`}
+                </p>
+              </div>
+            )
           ) : (
-            auctions.length !== 0 &&
-            auctions.map((data, index) => <ListView key={index} data={data} />)
+            <Loading />
           )}
-
-          <div className="paginataion flex gap-8 mt-6">
+          {/* <div className="paginataion flex gap-8 mt-6">
             <a className="w-10 h-10  font-bold text-lg bg-primary text-white flex justify-center items-center rounded-full cursor-pointer shadow-xl">
               1
             </a>
@@ -123,7 +141,7 @@ function ViewAll() {
             <a className="w-10 h-10  text-lg bg-white text-primary hover:bg-primary hover:text-white flex justify-center items-center rounded-full cursor-pointer shadow-xl">
               <FontAwesomeIcon icon={faArrowRight} size="sm" />
             </a>
-          </div>
+          </div> */}
         </div>
       </div>
     </section>

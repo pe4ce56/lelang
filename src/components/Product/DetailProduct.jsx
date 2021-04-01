@@ -20,7 +20,12 @@ import {
   subscribeToBid,
 } from "../../socket/detailProduct";
 
-function DetailProduct({ wishlist, toggleWishlist }) {
+function DetailProduct({
+  wishlist,
+  toggleWishlist,
+  showLogin,
+  setLoginMessage,
+}) {
   const { auction_id } = useParams();
 
   // to handle sub menu {description, bid}
@@ -70,14 +75,19 @@ function DetailProduct({ wishlist, toggleWishlist }) {
   const onBidSubmit = (e) => {
     e.preventDefault();
     if (auction.status === "close") return;
+    const client_id = auth("Login terlebih dahulu untuk menawar barang");
+    if (!client_id) return;
     const data = {
       auction_id,
-      client_id: 1,
+      client_id,
       offers: bidValue,
     };
+
+    const token = localStorage.getItem("token");
     axios(`${API}/api/auctions/bid/`, {
       method: "POST",
       data,
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
         setBidValue("");
@@ -86,25 +96,47 @@ function DetailProduct({ wishlist, toggleWishlist }) {
       })
       .catch((e) => {
         setBidValue("");
+        if (e.response.status == 403) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+        }
       });
   };
 
   const [commentValue, setCommentValue] = useState("");
   const handleComment = (e) => {
     e.preventDefault();
+    const client_id = auth("Login terlebih dahulu untuk berkomentar");
+    if (!client_id) return;
     const data = {
       auction_id,
-      client_id: 1,
+      client_id,
       text: commentValue,
     };
-
+    const token = localStorage.getItem("token");
     axios(`${API}/api/auctions/comment/`, {
       method: "POST",
       data,
-    }).then((res) => {
-      setCommentValue("");
-      sendComment(auction_id);
-    });
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => {
+        setCommentValue("");
+        sendComment(auction_id);
+      })
+      .catch((e) => {
+        if (e.response.status == 403) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+        }
+      });
+  };
+  const handleWishlist = () => {
+    const client_id = auth(
+      "Login terlebih dahulu untuk memasukkan ke wishlist"
+    );
+    if (!client_id) return;
+
+    toggleWishlist(auction_id);
   };
   const getComment = () => {
     axios(`${API}/api/auctions/comments/${auction_id}`).then((res) => {
@@ -133,7 +165,16 @@ function DetailProduct({ wishlist, toggleWishlist }) {
       }, 3000);
     });
   };
-
+  const auth = (msg) => {
+    const token = localStorage.getItem("token");
+    console.log(token);
+    if (!token) {
+      setLoginMessage(msg);
+      showLogin();
+      return null;
+    }
+    return JSON.parse(localStorage.getItem("user")).id;
+  };
   const BidHistories = () => (
     <table className="w-full border-gray-300 " style={{ borderWidth: 1 }}>
       <thead>
@@ -218,7 +259,7 @@ function DetailProduct({ wishlist, toggleWishlist }) {
         </div>
       </div>
     );
-    
+
   const Notif = () => {
     const props = useSpring({
       opacity: 1,
@@ -338,7 +379,7 @@ function DetailProduct({ wishlist, toggleWishlist }) {
                 </button>
               </form>
               <button
-                onClick={() => toggleWishlist(auction.auctions_id)}
+                onClick={handleWishlist}
                 className={
                   (wishlist.find(
                     (result) => result.auction_id == auction.auctions_id
@@ -419,14 +460,21 @@ function DetailProduct({ wishlist, toggleWishlist }) {
         </div>
       </section>
     </React.Fragment>
-  ) : (
-    "loading"
+  ) :(
+    <div className="m-10 ">
+      <p className="text-2xl text-color4 font-bold font-mont">
+        Sedang Mengambil Data.....
+      </p>
+    </div>
   );
 }
 const mapDispatchToProps = (dispatch) => {
   return {
     toggleWishlist: (id) =>
       dispatch({ type: actionType.TOGGLE_WISHLIST, value: id }),
+    showLogin: () => dispatch({ type: actionType.TOGGLE_LOGIN }),
+    setLoginMessage: (msg) =>
+      dispatch({ type: actionType.SET_LOGIN_MESSAGE, value: msg }),
   };
 };
 const mapStateToProps = (state) => ({

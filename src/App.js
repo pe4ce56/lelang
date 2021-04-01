@@ -1,5 +1,11 @@
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  useHistory,
+  useParams,
+} from "react-router-dom";
 import Navbar from "./components/Layouts/Navbar";
 import Home from "./components/Home/Home";
 import Footer from "./components/Layouts/Footer";
@@ -14,13 +20,31 @@ import { connect } from "react-redux";
 import ModalLogin from "./components/Layouts/ModalLogin";
 import actionType from "./redux/reducer/globalType";
 import axios from "axios";
+import Register from "./components/page/Register";
 
 function App({ toggleLogin, fetchWishlist }) {
   // fetch wishlist
   useEffect(() => {
-    axios(`${API}/api/auctions/wishlist/1`).then((res) => {
-      fetchWishlist(res.data.data);
-    });
+    if (localStorage.getItem("token")) {
+      const token = localStorage.getItem("token");
+      axios(
+        `${API}/api/auctions/wishlist/${
+          JSON.parse(localStorage.getItem("user")).id
+        }`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+        .then((res) => {
+          console.log(res.data.data);
+          fetchWishlist(res.data.data);
+        })
+        .catch((e) => {
+          console.log(e);
+          if (e.response.status == 403) {
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+          }
+        });
+    }
   }, []);
   return (
     <React.Fragment>
@@ -32,9 +56,7 @@ function App({ toggleLogin, fetchWishlist }) {
           <Route exact path="/">
             <Home />
           </Route>
-          <Route exact path="/products">
-            <ViewAll />
-          </Route>
+          <Route exact path="/products" component={ViewAll} />
           <Route exact path="/products/category/:category">
             <ViewProductByCategory />
           </Route>
@@ -43,6 +65,9 @@ function App({ toggleLogin, fetchWishlist }) {
           </Route>
           <Route exact path="/wishlist">
             <Wishlist />
+          </Route>
+          <Route exact path="/registrasi">
+            <Register />
           </Route>
         </Switch>
         <Footer />

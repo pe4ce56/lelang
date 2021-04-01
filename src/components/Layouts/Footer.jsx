@@ -1,6 +1,13 @@
-import { Fragment } from "react";
+import { Fragment, useEffect, useState } from "react";
+import { useLocation } from "react-router";
 
 function Footer() {
+  const { search } = useLocation();
+  const [query, setQuery] = useState("");
+  useEffect(() => {
+    const q = new URLSearchParams(search).get("q");
+    setQuery(q);
+  }, []);
   return (
     <Fragment>
       <div className="grid grid-cols-12 w-full px-6 md:px-10 py-6 bg-primary">
@@ -10,30 +17,32 @@ function Footer() {
           </p>
         </div>
         <div className="col-span-12 md:col-start-9 md:col-span-4">
-          <form method="GET" className="mt-2 md:mt-0 w-full">
-            <div class="relative text-gray-600 focus-within:text-gray-400">
-              <span class="absolute inset-y-0 right-0 flex items-center ">
+          <form method="GET" action="/products" className="mt-2 md:mt-0 w-full">
+            <div className="relative text-gray-600 focus-within:text-gray-400">
+              <span className="absolute inset-y-0 right-0 flex items-center ">
                 <button
                   type="submit"
-                  class=" group focus:outline-none focus:shadow-outline hover:bg-white   bg-secondary rounded-full h-full w-9 flex justify-center items-center"
+                  className=" group focus:outline-none focus:shadow-outline hover:bg-white   bg-secondary rounded-full h-full w-9 flex justify-center items-center"
                 >
                   <svg
                     fill="none"
                     stroke="currentColor"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="3"
                     viewBox="0 0 24 24"
-                    class="w-5 h-5 text-white group-hover:text-primary"
+                    className="w-5 h-5 text-white group-hover:text-primary"
                   >
                     <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                   </svg>
                 </button>
               </span>
               <input
+                onChange={(e) => setQuery(e.target.value)}
+                value={query || ""}
                 type="text"
                 name="q"
-                class="py-2 text-base text-color2 rounded-md pr-10 pl-2 focus:outline-none focus:bg-white focus:text-gray-900 rounded-full w-full"
+                className="py-2 text-base text-color2 rounded-md pr-10 pl-2 focus:outline-none focus:bg-white focus:text-gray-900 rounded-full w-full"
                 placeholder="Search..."
                 autoComplete="off"
               />
@@ -55,14 +64,14 @@ function Footer() {
           <p className="font-mont text-color3 text-sm">082217974659</p>
         </div>
 
-        <div className="col-span-12 md:col-span-4 mt-2">
+        {/* <div className="col-span-12 md:col-span-4 mt-2">
           <h2 className="font-mont text-secondary font-bold text-3xl">Link</h2>
           <ul className="font-mont text-color2 text-base list-disc ml-6">
             <li>Handphone</li>
             <li>Laptop</li>
             <li>Headphone</li>
           </ul>
-        </div>
+        </div> */}
         <div className="col-span-12">
           <p className="font-mont text-color3 text-sm mt-10">
             Copyright by Lelang. All Rights Reserved.
