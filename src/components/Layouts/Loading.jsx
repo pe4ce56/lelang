@@ -1,4 +1,7 @@
 import React, { Fragment } from "react";
+import { faCircleNotch } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 export default function Loading() {
   return (
     <div className="grid grid-cols-12 mt-2 w-full gap-4 mt-4">
@@ -32,3 +35,19 @@ export default function Loading() {
     </div>
   );
 }
+
+const LoadingSpinner = () => (
+  <div className="w-full h-full fixed block top-0 left-0 bg-white opacity-75 z-50">
+    <span
+      className="text-green-500 opacity-75 top-1/2 my-0 mx-auto block relative w-0 h-0"
+      style={{ top: 50 + "%" }}
+    >
+      <FontAwesomeIcon
+        className="fa-spin text-primary"
+        size="5x"
+        icon={faCircleNotch}
+      />
+    </span>
+  </div>
+);
+export { LoadingSpinner };

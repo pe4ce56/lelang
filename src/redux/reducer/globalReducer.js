@@ -40,41 +40,44 @@ const rootReducer = (state = globalState, action) => {
 
     case actionType.TOGGLE_WISHLIST:
       const token = localStorage.getItem("token");
-      console.log(token);
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
       if (token == null) return { ...state, wishlist: [] };
       const index = state.wishlist.findIndex(
         ({ auction_id }) => auction_id == action.value
       );
-      console.log("index", index);
       // checking exist
       if (index !== -1) {
         // delete wishlis
         if (state.wishlist.length > -1) {
           axios(`${API}/API/auctions/wishlist`, {
             method: "DELETE",
-            data: { auction_id: action.value, client_id: 1 },
+            data: { auction_id: action.value, client_id: user.client_id },
             headers: { Authorization: `Bearer ${token}` },
-          }).catch((e) => {
-            if (e.response.status == 403) {
-              localStorage.removeItem("token");
-              localStorage.removeItem("user");
-            }
-          });
+          })
+            .then((res) => {
+              console.log(res);
+            })
+            .catch((e) => {
+              if (e.response.status == 403) {
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+              }
+            });
+
           return {
             ...state,
             wishlist: state.wishlist.filter(
-              ({ auction_id }) => auction_id !== action.value
+              ({ auction_id }) => auction_id != action.value
             ),
           };
         }
 
         return state;
       }
-
       // add wishlist
       axios(`${API}/API/auctions/wishlist`, {
         method: "POST",
-        data: { auction_id: action.value, client_id: 1 },
+        data: { auction_id: action.value, client_id: user.client_id },
         headers: { Authorization: `Bearer ${token}` },
       }).catch((e) => {
         if (e.response.status == 403) {

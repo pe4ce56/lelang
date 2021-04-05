@@ -33,7 +33,7 @@ function Wishlist(props) {
       const token = localStorage.getItem("token");
       axios(
         `${API}/api/auctions/wishlist/${
-          JSON.parse(localStorage.getItem("user")).id
+          JSON.parse(localStorage.getItem("user")).client_id
         }`,
         { headers: { Authorization: `Bearer ${token}` } }
       )
@@ -69,13 +69,13 @@ function Wishlist(props) {
         </p>
         <button
           onClick={() => showQuickView(wish.auction_id)}
-          className="md:ml-10 focus:outline-none rounded-full bg-primary py-2 px-3 text-white text-sm font-bold md:w-auto w-1/2 -center"
+          className="md:ml-10 focus:outline-none rounded-full bg-primary py-2 px-3 text-white text-sm font-bold md:w-auto w-1/2 text-center"
         >
           Quick View
         </button>
         <Link
           to={`/products/${wish.auction_id}`}
-          className="md:ml-3 focus:outline-none rounded-full bg-primary py-2 px-3 text-white text-sm font-bold md:w-auto w-1/2 -center"
+          className="md:ml-3 mt-2 md:mt-0 focus:outline-none rounded-full bg-primary py-2 px-3 text-white text-sm font-bold md:w-auto w-1/2 text-center"
         >
           Tawar Sekarang
         </Link>

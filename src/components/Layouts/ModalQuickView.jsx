@@ -5,6 +5,7 @@ import actionType from "../../redux/reducer/globalType";
 
 import { API } from "../../config/config";
 import { formatRupiah } from "../../config/helper";
+import { LoadingSpinner } from "./Loading";
 function ModalQuickView({ hideModal, id }) {
   //get Data auction
   const [auction, setAuctions] = useState({});
@@ -41,7 +42,7 @@ function ModalQuickView({ hideModal, id }) {
               <div className=" grid grid-cols-12 h-full">
                 <div className="col-span-12 md:col-span-6 flex justify-center items-center">
                   <img
-                    class="object-contain w-3/4 md:w-3/4 h-auto "
+                    className="object-contain w-3/4 md:w-3/4 h-auto "
                     src={`${API}/items_image/${auction.item_id}/${auction.images[0].path}`}
                     alt="Sunset in the mountains"
                   />
@@ -66,7 +67,7 @@ function ModalQuickView({ hideModal, id }) {
               </div>
             </div>
           ) : (
-            "loading"
+            <LoadingSpinner />
           )}
         </div>
       </div>

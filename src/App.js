@@ -21,15 +21,19 @@ import ModalLogin from "./components/Layouts/ModalLogin";
 import actionType from "./redux/reducer/globalType";
 import axios from "axios";
 import Register from "./components/page/Register";
+import SuccessRegiister from "./components/page/SuccessRegister";
+import Profile from "./components/page/Profile";
+import NotFound from "./components/page/NotFound";
 
 function App({ toggleLogin, fetchWishlist }) {
   // fetch wishlist
+
   useEffect(() => {
     if (localStorage.getItem("token")) {
       const token = localStorage.getItem("token");
       axios(
         `${API}/api/auctions/wishlist/${
-          JSON.parse(localStorage.getItem("user")).id
+          JSON.parse(localStorage.getItem("user")).client_id
         }`,
         { headers: { Authorization: `Bearer ${token}` } }
       )
@@ -38,37 +42,31 @@ function App({ toggleLogin, fetchWishlist }) {
           fetchWishlist(res.data.data);
         })
         .catch((e) => {
-          console.log(e);
-          if (e.response.status == 403) {
-            localStorage.removeItem("token");
-            localStorage.removeItem("user");
-          }
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
         });
     }
   }, []);
   return (
     <React.Fragment>
-      {toggleLogin && <ModalLogin />}
       <Router>
+        {toggleLogin && <ModalLogin />}
         <ScrollToTop />
         <Navbar />
         <Switch>
-          <Route exact path="/">
-            <Home />
-          </Route>
+          <Route exact path="/" component={Home} />
           <Route exact path="/products" component={ViewAll} />
-          <Route exact path="/products/category/:category">
-            <ViewProductByCategory />
-          </Route>
-          <Route exact path="/products/:auction_id">
-            <DetailProduct />
-          </Route>
-          <Route exact path="/wishlist">
-            <Wishlist />
-          </Route>
-          <Route exact path="/registrasi">
-            <Register />
-          </Route>
+          <Route
+            exact
+            path="/products/category/:category"
+            component={ViewProductByCategory}
+          />
+          <Route exact path="/products/:auction_id" component={DetailProduct} />
+          <Route exact path="/wishlist" component={Wishlist} />
+          <Route exact path="/registrasi" component={Register} />
+          <Route exact path="/success/" component={SuccessRegiister} />
+          <Route exact path="/profile/" component={Profile} />
+          <Route path="*" exact component={NotFound} />
         </Switch>
         <Footer />
       </Router>

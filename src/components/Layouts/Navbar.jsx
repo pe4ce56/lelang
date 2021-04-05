@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import swal from "sweetalert";
 import { Link, useLocation } from "react-router-dom";
 import { connect } from "react-redux";
 import actionType from "../../redux/reducer/globalType";
@@ -13,13 +14,13 @@ function Navbar({
   const route = arrPath[1] || "home";
   const [login, setLogin] = useState(false);
   const [query, setQuery] = useState("");
+  const [toggle, setToggle] = useState(false);
   useEffect(() => {
     const q = new URLSearchParams(search).get("q");
     setQuery(q);
   }, []);
   useEffect(() => {
     const token = localStorage.getItem("token");
-    console.log(token);
     if (token) {
       setLogin(true);
       return;
@@ -33,10 +34,19 @@ function Navbar({
       showLogin();
       return;
     }
-    removeWishlist();
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setLogin(false);
+    swal({
+      title: "Yakin ingin keluar?",
+      icon: "warning",
+      buttons: true,
+      dangerMode: true,
+    }).then((willLogout) => {
+      if (willLogout) {
+        removeWishlist();
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        setLogin(false);
+      }
+    });
   };
 
   return (
@@ -107,68 +117,122 @@ function Navbar({
             </div>
           </Link>
         </div>
-        <nav className="px-10 flex bg-primary h-14 font-mont font-bold text-xs">
-          <div className="flex bg-white px-6 justify-center items-center focus:outline-none">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              className="w-4 mr-2 text-color4"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
-            <h6 className="text-color3 font-bold text-base">Kategori</h6>
-          </div>
-          <ul className="px-10 col-span-2  md:col-span-3 hidden  md:flex flex-grow items-center text-white">
-            <li className="nav-item flex flex-col justify-center group">
-              <div
-                className={
-                  (route == "home" ? "opacity-100" : "opacity-0") +
-                  " group-hover:opacity-100 w-1/2  bg-white self-center"
-                }
-                style={{ height: 2 }}
-              ></div>
-              <Link
-                className="px-3 py-2 flex items-center text-xs font-normal uppercase leading-snug text-white "
-                to="/"
-              >
-                Home
-              </Link>
-            </li>
-            <li className="nav-item inline px-4 cursor-pointer uppercase tracking-wide relative flex flex-col justify-center group">
-              <div
-                className={
-                  (route == "products" ? "opacity-100" : "opacity-0") +
-                  " group-hover:opacity-100 w-1/2  bg-white self-center"
-                }
-                style={{ height: 2 }}
-              ></div>
-              <Link
-                className="px-3 py-2 flex items-center text-xs uppercase  font-normal leading-snug text-white group-hover:font-bold"
-                to="/products"
-              >
-                Lelang
-              </Link>
-            </li>
-          </ul>
-          <div className="col-start-8 col-span-1 flex items-center">
-            <button
-              onClick={handleAuth}
-              className="text-white focus:outline-none text-white px-2 py-1 text-sm rounded  mr-3"
-            >
-              {login ? "Logout" : "login"}
-            </button>
 
-            {/*  <button className="bg-danger hover:bg-danger-2 border-2- border-danger focus:outline-none text-white px-2 py-1 text-sm rounded">
-                    Register
-                  </button>
-            */}
+        <nav className="flex items-center justify-between flex-wrap bg-primary p-6 md:px-20">
+          <div className="flex items-center flex-no-shrink text-white mr-6">
+            <span className="font-semibold text-xl tracking-tight">
+              Lelang Kita
+            </span>
+          </div>
+          <div className="block md:hidden">
+            <button
+              onClick={() => {
+                setToggle(!toggle);
+              }}
+              className="flex items-center px-3 py-2 border rounded  border-white hover:text-white  text-white hover:border-white focus:outline-none hover:bg-blue-400"
+            >
+              <svg
+                className="h-3 w-3  fill-current "
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <title>Menu</title>
+                <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
+              </svg>
+            </button>
+          </div>
+          <div
+            className={
+              (toggle ? "block" : "hidden") +
+              " w-full flex-grow md:flex md:items-center md:w-auto md:ml-6 transition ease-in duration-700"
+            }
+          >
+            <ul className="md:flex  gap-4 md:flex-grow">
+              <li className="nav-item justify-center group w-full md:w-auto">
+                <div
+                  className={
+                    (route == "home" ? "opacity-100" : "opacity-0") +
+                    " group-hover:opacity-100 hidden md:block bg-white self-center "
+                  }
+                  style={{ height: 2 }}
+                ></div>
+                <Link
+                  className={
+                    (route == "home"
+                      ? "text-white font-bold"
+                      : "text-gray-200 font-bold") +
+                    "items-center text-xs group-hover:text-gray-200 uppercase leading-snug "
+                  }
+                  to="/"
+                >
+                  Home
+                </Link>
+              </li>
+              <li className="nav-item justify-center group  w-full md:w-auto">
+                <div
+                  className={
+                    (route == "products" ? "opacity-100" : "opacity-0") +
+                    " group-hover:opacity-100 hidden md:block bg-white self-center "
+                  }
+                  style={{ height: 2 }}
+                ></div>
+                <Link
+                  className={
+                    (route == "products"
+                      ? "text-white font-bold"
+                      : "text-gray-200 font-bold") +
+                    "items-center text-xs group-hover:text-gray-200 uppercase leading-snug "
+                  }
+                  to="/products"
+                >
+                  Product
+                </Link>
+              </li>
+              <li className="nav-item justify-center group  w-full md:hidden">
+                <div
+                  className={
+                    (route == "products" ? "opacity-100" : "opacity-0") +
+                    " group-hover:opacity-100 hidden md:block bg-white self-center "
+                  }
+                  style={{ height: 2 }}
+                ></div>
+                <Link
+                  className={
+                    (route == "wishlish"
+                      ? "text-white font-bold"
+                      : "text-gray-200 font-bold") +
+                    "items-center text-xs group-hover:text-gray-200 uppercase leading-snug "
+                  }
+                  to="/wishlist"
+                >
+                  Wishlist
+                </Link>
+              </li>
+            </ul>
+            <div>
+              <button
+                type="button"
+                onClick={handleAuth}
+                className="inline-block text-sm px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-primary hover:bg-white mt-4 md:mt-0 focus:outline-none"
+              >
+                {login ? "Logout" : "login"}
+              </button>
+              {login ? (
+                <Link
+                  to="/profile"
+                  className="inline-block text-sm px-4 py-2 ml-2 leading-none border rounded text-white border-secondary hover:border-white bg-secondary mt-4 md:mt-0 focus:outline-none hover:bg-primary "
+                >
+                  Profile
+                </Link>
+              ) : (
+                <Link
+                  to="/registrasi"
+                  className="inline-block text-sm px-4 py-2 ml-2 leading-none border rounded text-white border-secondary hover:border-white bg-secondary mt-4 md:mt-0 focus:outline-none hover:bg-primary "
+                >
+                  registrasi
+                </Link>
+              )}
+            </div>
           </div>
         </nav>
       </header>

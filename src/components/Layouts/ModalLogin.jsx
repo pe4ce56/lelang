@@ -3,9 +3,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { useState } from "react";
 import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import { Link } from "react-router-dom";
 import { API } from "../../config/config";
 import actionType from "../../redux/reducer/globalType";
+import { LoadingSpinner } from "./Loading";
 
 function ModalLogin({
   hideModal,
@@ -20,12 +21,23 @@ function ModalLogin({
       hideModal();
     }
   };
-
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState({
+    beforeSubmit: false,
+    afterSubmit: false,
+  });
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log(error);
+    setError({ beforeSubmit: false });
+    if (!username || !password) {
+      setError({ beforeSubmit: true });
+      return;
+    }
+    setLoading(true);
     axios(`${API}/api/auth`, {
       method: "POST",
       data: { username, password },
@@ -43,18 +55,20 @@ function ModalLogin({
           removeLoginMessage();
           hideModal();
         }
+        setLoading(false);
       })
       .catch((e) => {
-        console.log(e);
+        setError({ afterSubmit: true });
+        setLoading(false);
       });
   };
 
   return (
     <main
-      onClick={hide}
       data-value="modal"
       className="flex justify-center items-center overflow-x-hidden overflow-y-auto fixed inset-0 z-50 bg-black bg-opacity-70"
     >
+      {loading && <LoadingSpinner />}
       <div className="relative w-auto my-6 mx-auto w-3/4 md:max-w-2xl h-auto lg:h-3/4">
         {/*content*/}
         <div className="border-0 shadow-lg relative flex flex-col w-full h-full bg-secondary rounded-xl overflow-hidden">
@@ -108,6 +122,12 @@ function ModalLogin({
                 className="mt-5 w-full  focus:outline-none bg-gray-100 rounded-full py-3 pr-4 pl-12 text-color3 font-mont"
               />
             </div>
+            {(error.beforeSubmit || error.afterSubmit) && (
+              <p className="mt-2 text-sans text-red-500">
+                Username/password{" "}
+                {error.beforeSubmit ? " Tidak Boleh kosong!!" : " Salah!!"}
+              </p>
+            )}
             <div className="flex">
               <button
                 type="submit"
@@ -116,16 +136,17 @@ function ModalLogin({
               >
                 Login
               </button>
-              <button
-                type="button"
+              <Link
+                onClick={hideModal}
+                to="/registrasi"
                 className="ml-3 mt-6 px-8 py-2 rounded-full bg-primary text-white text-lg font-mont font-bold"
               >
                 Registrasi
-              </button>
+              </Link>
             </div>
-            <p className="mt-4 font-mont text-primary text-base">
+            {/* <p className="mt-4 font-mont text-primary text-base">
               Lupa Password?
-            </p>
+            </p> */}
           </form>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import React, { Fragment, useEffect, useState } from "react";
+import swal from "sweetalert";
 import { faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { connect } from "react-redux";
@@ -19,6 +20,7 @@ import {
   subcribeToComment,
   subscribeToBid,
 } from "../../socket/detailProduct";
+import { LoadingSpinner } from "../Layouts/Loading";
 
 function DetailProduct({
   wishlist,
@@ -27,7 +29,7 @@ function DetailProduct({
   setLoginMessage,
 }) {
   const { auction_id } = useParams();
-
+  const [loading, setLoading] = useState(true);
   // to handle sub menu {description, bid}
   const [subMenu, setSubMenu] = useState("description");
   // to handle data auction
@@ -59,12 +61,12 @@ function DetailProduct({
     getDataAuction();
     getComment();
     getBid();
-
     return () => {
       disconnectSocket();
     };
   }, []);
 
+  // to get data auction
   const getDataAuction = () => {
     axios(`${API}/api/auctions/${auction_id}`).then((res) => {
       setAuction(res.data.data);
@@ -74,9 +76,13 @@ function DetailProduct({
   const [bidValue, setBidValue] = useState("");
   const onBidSubmit = (e) => {
     e.preventDefault();
-    if (auction.status === "close") return;
+    if (auction.status === "close") {
+      swal("Lelang telah ditutup!", "Anda tidak bisa menawar lagi!", "error");
+      return;
+    }
     const client_id = auth("Login terlebih dahulu untuk menawar barang");
     if (!client_id) return;
+    setLoading(true);
     const data = {
       auction_id,
       client_id,
@@ -90,24 +96,30 @@ function DetailProduct({
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
+        swal("Berhasil!", "Tawaran berhasil disimpan!", "success");
         setBidValue("");
         sendBid(auction_id, res.data.data[0]);
         getBid();
+        setLoading(false);
       })
       .catch((e) => {
+        console.log(e);
         setBidValue("");
         if (e.response.status == 403) {
           localStorage.removeItem("token");
           localStorage.removeItem("user");
         }
+        setLoading(false);
       });
   };
 
+  // to handle comment submit
   const [commentValue, setCommentValue] = useState("");
   const handleComment = (e) => {
     e.preventDefault();
     const client_id = auth("Login terlebih dahulu untuk berkomentar");
     if (!client_id) return;
+    setLoading(true);
     const data = {
       auction_id,
       client_id,
@@ -122,14 +134,18 @@ function DetailProduct({
       .then((res) => {
         setCommentValue("");
         sendComment(auction_id);
+        setLoading(false);
       })
       .catch((e) => {
         if (e.response.status == 403) {
           localStorage.removeItem("token");
           localStorage.removeItem("user");
         }
+        setLoading(false);
+        swal("Ups!", "Terjadi Kesalahan!", "error");
       });
   };
+  // to handle toggle wishlit
   const handleWishlist = () => {
     const client_id = auth(
       "Login terlebih dahulu untuk memasukkan ke wishlist"
@@ -138,14 +154,17 @@ function DetailProduct({
 
     toggleWishlist(auction_id);
   };
+  // to get comments
   const getComment = () => {
     axios(`${API}/api/auctions/comments/${auction_id}`).then((res) => {
+      console.log(res);
       setComments(res.data.data);
     });
   };
   const getBid = () => {
     axios(`${API}/api/auctions/bid/${auction_id}`).then((res) => {
       setBid(res.data.data);
+      setLoading(false);
     });
   };
   // to handle if on new bid emitted
@@ -165,6 +184,8 @@ function DetailProduct({
       }, 3000);
     });
   };
+
+  // checking login or not and return client id
   const auth = (msg) => {
     const token = localStorage.getItem("token");
     console.log(token);
@@ -173,14 +194,16 @@ function DetailProduct({
       showLogin();
       return null;
     }
-    return JSON.parse(localStorage.getItem("user")).id;
+    return JSON.parse(localStorage.getItem("user")).client_id;
   };
+
+  // ui histories
   const BidHistories = () => (
     <table className="w-full border-gray-300 " style={{ borderWidth: 1 }}>
       <thead>
         <tr className="text-left ">
           <th className="w-1/2 border-gray-300 px-3" style={{ borderWidth: 1 }}>
-            TanggalHistoryAuctions
+            Tanggal
           </th>
           <th className="w-1/4 border-gray-300 px-3" style={{ borderWidth: 1 }}>
             Tawaran
@@ -212,6 +235,7 @@ function DetailProduct({
     </table>
   );
 
+  // ui count down
   const countDownView = ({ days, hours, minutes, seconds, completed }) => (
     <Fragment>
       <div className="grid-span-1 text-center">
@@ -241,13 +265,18 @@ function DetailProduct({
     </Fragment>
   );
 
+  // ui comment
   const Comment = ({ comment }) =>
     comment.client_id && (
       <div className="flex mt-8 mx-10">
         <div className="pt-2">
           <img
             className="object-contain w-10 h-10 rounded-full"
-            src="/profile/profile1.jpeg"
+            src={
+              comment.profile_image
+                ? `${API}/profile_images/clients/${comment.profile_image}`
+                : `${API}/img/profile_small.jpg`
+            }
           />
         </div>
         <div className="ml-3">
@@ -285,16 +314,18 @@ function DetailProduct({
     );
   };
 
-  return auction.auctions_id ? (
+  return (
     <React.Fragment>
+      {loading && <LoadingSpinner />}
+
       <Notif />
       <section className="px-4 md:px-10 py-6">
         <div className="mb-10">
           <p className="text-mont text-base text-color2">
-            Lelang / {auction.item_name}
+            Lelang / {auction?.item_name}
           </p>
           <p className="text-mont font-bold text-3xl text-secondary capitalize">
-            {auction.item_name}
+            {auction?.item_name}
           </p>
         </div>
         <hr />
@@ -307,24 +338,24 @@ function DetailProduct({
                 src={
                   imageActive
                     ? imageActive
-                    : auction.images &&
-                      `${API}/items_image/${auction.item_id}/${auction.images[0].path}`
+                    : auction?.images &&
+                      `${API}/items_image/${auction?.item_id}/${auction?.images[0].path}`
                 }
                 alt="Sunset in the mountains"
               />
             </div>
-            <div className="flex mt-6 cursor-pointer">
-              {auction.images &&
-                auction.images.map((image, index) => (
+            <div className="flex mt-6 cursor-pointer overflow-hidden">
+              {auction?.images &&
+                auction?.images.map((image, index) => (
                   <img
                     key={index}
                     onClick={() =>
                       setImageActive(
-                        `${API}/items_image/${auction.item_id}/${image.path}`
+                        `${API}/items_image/${auction?.item_id}/${image.path}`
                       )
                     }
                     className="object-contain w-auto h-20"
-                    src={`${API}/items_image/${auction.item_id}/${image.path}`}
+                    src={`${API}/items_image/${auction?.item_id}/${image.path}`}
                     alt="Sunset in the mountains"
                   />
                 ))}
@@ -333,13 +364,13 @@ function DetailProduct({
           {/*Deskripsi */}
           <div className="col-span-12 lg:col-span-6">
             <p className="text-base text-color2 text-mont">
-              {auction.description && parse(auction.description)}
+              {auction?.description && parse(auction?.description)}
             </p>
             <p className="text-lg text-secondary font-bold text-2xl mt-4 mb-6">
               Penawaran Tertinggi:{" "}
-              {bid.length && bid[0].current_bid
+              {bid?.length && bid[0]?.current_bid
                 ? formatRupiah(bid[0].current_bid, "Rp. ")
-                : formatRupiah(auction.price, "Rp. ")}
+                : formatRupiah(auction?.price || 0, "Rp. ")}
             </p>
             <hr />
 
@@ -347,13 +378,13 @@ function DetailProduct({
             <p className="mt-2 text-base text-color3">Sisa Waktu:</p>
             <div className="py-2 h-20  w-full grid grid-flow-col grid-cols-4 shadow-lg  divide-x items-center">
               <Countdown
-                date={new Date(auction.end_date)}
+                date={new Date(auction?.end_date)}
                 renderer={countDownView}
               />
             </div>
             <p className="mt-4 text-base text-color3">
               Lelang berakhir:{" "}
-              {auction.end_date ? formatDate(auction.end_date) : "-"}
+              {auction?.end_date ? formatDate(auction?.end_date) : "-"}
             </p>
             <div className="relative w-auto mt-4">
               {/*
@@ -367,7 +398,9 @@ function DetailProduct({
               <form onSubmit={onBidSubmit}>
                 <input
                   value={bidValue}
-                  onChange={(e) => setBidValue(e.target.value)}
+                  onChange={(e) => {
+                    setBidValue(e.target.value.replace(/\D/, ""));
+                  }}
                   className="text-secondary py-2 px-4 text-lg w-full focus:outline-none rounded-full border-radius-5 border-color2 border-1"
                   placeholder="Penawaran (Rp)"
                 />
@@ -381,7 +414,7 @@ function DetailProduct({
               <button
                 onClick={handleWishlist}
                 className={
-                  (wishlist.find(
+                  (wishlist?.find(
                     (result) => result.auction_id == auction.auctions_id
                   )
                     ? "bg-primary text-white hover:bg-white hover:text-primary "
@@ -389,7 +422,7 @@ function DetailProduct({
                   "mt-4 focus:outline-none rounded-full text-lg p-3  w-full  justify-center items-center cursor-pointer border-1 border-grey-300  transition delay-100 duration-500 ease-in-out"
                 }
               >
-                {wishlist.find(
+                {wishlist?.find(
                   (result) => result.auction_id == auction.auctions_id
                 )
                   ? "Hapus dari Wishlist"
@@ -425,7 +458,7 @@ function DetailProduct({
         <div className="mt-6 ">
           {subMenu == "description" ? (
             <p className="text-base text-color3">
-              {auction.description && parse(auction.description)}
+              {auction?.description && parse(auction?.description)}
             </p>
           ) : (
             bid && <BidHistories />
@@ -460,12 +493,6 @@ function DetailProduct({
         </div>
       </section>
     </React.Fragment>
-  ) :(
-    <div className="m-10 ">
-      <p className="text-2xl text-color4 font-bold font-mont">
-        Sedang Mengambil Data.....
-      </p>
-    </div>
   );
 }
 const mapDispatchToProps = (dispatch) => {

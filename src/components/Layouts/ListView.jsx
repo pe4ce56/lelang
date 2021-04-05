@@ -16,7 +16,33 @@ import actionType from "../../redux/reducer/globalType";
 import { formatRupiah } from "../../config/helper";
 
 function ListView(props) {
-  const { wishlist, toggleWishlist, showQuickView, quickView, data } = props;
+  const {
+    wishlist,
+    toggleWishlist,
+    showQuickView,
+    setLoginMessage,
+    showLogin,
+    quickView,
+    data,
+  } = props;
+  const handleWishlist = () => {
+    const client_id = auth(
+      "Login terlebih dahulu untuk memasukkan ke wishlist"
+    );
+    if (!client_id) return;
+
+    toggleWishlist(data.auctions_id);
+  };
+  const auth = (msg) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setLoginMessage(msg);
+      showLogin();
+      return null;
+    }
+    return JSON.parse(localStorage.getItem("user")).id;
+  };
+
   return (
     data && (
       <React.Fragment>
@@ -27,7 +53,7 @@ function ListView(props) {
               <FontAwesomeIcon icon={faGavel} />
             </div>
             <div
-              onClick={() => toggleWishlist(data.auctions_id)}
+              onClick={handleWishlist}
               className={
                 (wishlist.find((result) => {
                   return result.auction_id == data.auctions_id;
@@ -94,6 +120,9 @@ const mapDispatchToProps = (dispatch) => {
       dispatch({ type: actionType.SHOW_QUICK_VIEW, value: id }),
     toggleWishlist: (id) =>
       dispatch({ type: actionType.TOGGLE_WISHLIST, value: id }),
+    setLoginMessage: (msg) =>
+      dispatch({ type: actionType.SET_LOGIN_MESSAGE, value: msg }),
+    showLogin: () => dispatch({ type: actionType.TOGGLE_LOGIN }),
   };
 };
 
