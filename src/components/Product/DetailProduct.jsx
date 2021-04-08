@@ -472,11 +472,11 @@ function DetailProduct({
               value={commentValue}
               onChange={(e) => setCommentValue(e.target.value)}
               placeholder="Tambahkan komentar"
-              className="col-span-11 w-full focus:outline-none text-xl p-3 border-grey-500 focus:border-primary hover:border-primary border-1"
+              className="col-span-8 md:col-span-11 w-full focus:outline-none text-xl p-3 border-grey-500 focus:border-primary hover:border-primary border-1"
             />
             <button
               type="submit"
-              className="col-span-1 w-full focus:outline-none bg-primary text-white hover:bg-white hover:text-primary"
+              className="col-span-4 md:col-span-1 w-full focus:outline-none bg-primary text-white hover:bg-white hover:text-primary"
             >
               Kirim <FontAwesomeIcon icon={faPaperPlane} size="1x" />
             </button>

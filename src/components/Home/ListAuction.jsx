@@ -78,8 +78,8 @@ function ListAuction({
           <div className="mb-2 flex ">
             <p className="text-color2 text-sm font-mont">Tawaran:</p>
             <p className="text-secondary font-bold text-sm font-mont">
-              {data.price}
-              {/* {formatRupiah(data.price, "Rp.")} */}
+              {/* {data.price}   */}
+              {formatRupiah(data.price, "Rp.")}
             </p>
           </div>
           <div className="flex ">

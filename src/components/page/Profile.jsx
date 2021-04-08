@@ -176,11 +176,12 @@ const Profile = () => {
       .then(() => {
         setEditImage(false);
       })
-      .catch(() => {
+      .catch((e) => {
+        console.log(e);
         setEditImage(false);
         swal({
           title: "Oopss...!!",
-          text: "Profile gagal diubah!!",
+          text: "Foto profil gagal diubah!!",
           icon: "warning",
           dangerMode: true,
         });
@@ -459,11 +460,11 @@ const Profile = () => {
               </div>
               <div>
                 {editProfile && (
-                  <div className="mt-8">
+                  <div className="mt-6 md:flex ">
                     <button
                       type="submit"
-                      className="bg-white rounded-full px-6 hover:bg-gray-100  text-sm focus:outline-none"
-                      style={{ paddingBottom: 2, paddingTop: 2 }}
+                      className="mt-2 bg-white rounded-full px-6 hover:bg-gray-100 w-full text-center text-sm focus:outline-none py-2"
+                      // style={{ paddingBottom: 4, paddingTop: 4 }}
                     >
                       Simpan Perubahan
                     </button>
@@ -473,28 +474,28 @@ const Profile = () => {
                         setErrorFormValue({});
                         setEditProfile(false);
                       }}
-                      className="ml-4 bg-white rounded-full px-6  inline hover:bg-gray-100 text-sm focus:outline-none cursor-pointer"
-                      style={{ paddingBottom: 2, paddingTop: 2 }}
+                      className="mt-2 md:ml-4 py-2 bg-white rounded-full px-6 text-center w-full inline hover:bg-gray-100 text-sm focus:outline-none cursor-pointer"
+                      // style={{ paddingBottom: 2, paddingTop: 2 }}
                     >
                       Cancel
                     </div>
                   </div>
                 )}
                 {!editPassword && !editProfile && (
-                  <div className="mt-8 float-right flex">
+                  <div className="mt-6 md:float-right md:flex">
                     <div
                       type="button"
                       onClick={(e) => setEditProfile(true)}
-                      className="bg-white rounded-full px-6 hover:bg-gray-100  text-sm focus:outline-none cursor-pointer mr-2"
-                      style={{ paddingBottom: 2, paddingTop: 2 }}
+                      className="mt-2 bg-white py-2 rounded-full px-6 hover:bg-gray-100  text-sm text-center focus:outline-none cursor-pointer md:mr-2"
+                      // style={{ paddingBottom: 2, paddingTop: 2 }}
                     >
                       Edit Profile
                     </div>
                     <div
                       type="button"
                       onClick={(e) => setEditPassword(true)}
-                      className="bg-white rounded-full px-6 hover:bg-gray-100  text-sm focus:outline-none cursor-pointer"
-                      style={{ paddingBottom: 2, paddingTop: 2 }}
+                      className="mt-2 bg-white py-2 rounded-full px-6 hover:bg-gray-100 text-center  text-sm focus:outline-none cursor-pointer"
+                      // style={{ paddingBottom: 2, paddingTop: 2 }}
                     >
                       Ubah Password
                     </div>
